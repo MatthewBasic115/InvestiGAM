@@ -8,22 +8,33 @@
 # https://shiny.posit.co/r/components/inputs/select-multiple/
 
 library(shiny)
-library(mgcv)            # Fit and interrogate GAMs
-library(tidyverse)       # Tidy and flexible data manipulation
-library(marginaleffects) # Compute conditional and marginal effects
-library(ggplot2)         # Flexible plotting
-library(patchwork)       # Combining ggplot objects
+library(vroom)             # Load user supplied data
+library(mgcv)              # Fit and interrogate GAMs
+library(tidyverse)         # Tidy and flexible data manipulation
+library(marginaleffects)   # Compute conditional and marginal effects
+library(ggplot2)           # Flexible plotting
+library(patchwork)         # Combining ggplot objects
 library(gratia)
-library(DT)              # render data table outputs in Shiny
+library(DT)                # render data table outputs in Shiny
 library(glue)
 library(rlang)
-source("ui_functions.R")
+library(bslib)             # Bootstrap library for Shiny layouts
+library(gamair)            # Contains datasets useful for learning GAMs
+library(markdown)          # Allows for the use of markdown pages in the application
+source("ui_helpers.R")
 source("wrapper_helpers.R")
 source("math_helpers.R")
+source("plot_helpers.R")
+source("help_text.R")      # Contains help text for pop-ups
+source("student_server.R") # Student journey module
+source("teach_ui.R")
 
-# preload the C02 dataset
-# load C02 dataset
-data(CO2, package = "datasets")
+# TODO: Try and replace observeEvent with bindEvent when possible.
+# TODO: Export plots as png (config item)
+# TODO: https://mastering-shiny.org/basic-ui.html extensions look good. In particular drag and drop and widgets.
+# TODO: Tesing modules In particular for testing
+
+
 
 # define custom ggplot2 theme
 theme_set(theme_classic(base_size = 12, base_family = 'serif') +
@@ -34,13 +45,27 @@ theme_set(theme_classic(base_size = 12, base_family = 'serif') +
                   panel.spacing = unit(0, 'lines'),
                   legend.margin = margin(0, 0, 0, -15)))
 
+
+##### Data #####
+# Variable to hold ID for student journey module-ui pair.
+student_id = "student"
+
+# https://cran.r-project.org/web/packages/gamair/gamair.pdf pg 52
+# Simon Wood
+data(brain)
+brain <- brain[brain$medFPQ>5e-3,]
+
+# preload the C02 dataset
+# load C02 dataset
+data(CO2, package = "datasets")
+
 # manipulations for modelling
 plant <- CO2 |>
   as_tibble() |>
   rename(plant = Plant, type = Type, treatment = Treatment) |>
   mutate(plant = factor(plant, ordered = FALSE))
 
-# fit model
+# fit model - from GAMbler blog
 model_1 <- gam(uptake ~ treatment * type + 
                  s(plant, bs = "re") +
                  s(conc, by = treatment, k = 7),
@@ -52,105 +77,144 @@ model_1 <- gam(uptake ~ treatment * type +
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-  
-    selectInput("dataset", label = "Dataset", choices = ls("package:datasets"), selected="CO2"),
-    responseScaleSelector("link_response"),
     
     titlePanel("Spline Splitter"),
+    selectInput("dataset", label = "Dataset", choices = ls("package:datasets"), selected="CO2"),
     tabsetPanel(
-      tabPanel("Build",
-          # Build model
-          titlePanel("Build GAM"),
-          # Note, not currently functional, CO2 is always the base
-          selectInput("dataset", label = "Dataset", choices = ls("package:datasets"), selected="CO2"),
-          
-          selectInput("gam_method", label="Method", choices=getGamMethods()),
-          
-          selectInput("gam_family", label="Family", choices=getGamFamilies()),
-          
-          # gam_link is updated once a family is selected
-          selectInput("gam_link", label="Link", choices=c()),
-          
-          # Build Model - User can expressly enter their formula
-          textInput("formula", "raw formula", "enter raw formula"),
-          
-          # button to build the model
-          actionButton("build","create"),
-          
-          #dataTableOutput("userModelSummary"),
-          
-          titlePanel("Appraisal Plots")
-          
-          plotOutput("userModelAppraisal")
-          
-      ), # end tabPanel Build
-      tabPanel("Interpret",
-               
-        titlePanel("Interpret"),
-        
-        navlistPanel(
-          id="Compare",
-          ########### PREDICTIONS PANEL ###########################
-          tabPanel("Predictions", 
-              verbatimTextOutput("Plot Predictions"),
-              ##### PLOT PREDICTIONS
-              # Select the response scale for the plot predictions
-              selectizeInput("plot_pred_cond", "Select Features",
-                             # ensure there is a default selection, make lower case for consistency
-                             tolower(colnames(CO2)), multiple=TRUE, selected=tolower(colnames(CO2)[1])),
-              plotOutput("plot_pred"),
-          ), # end tabPanel Predictions
-          ######## SLOPES PANEL ##########
-          tabPanel("Slopes", 
-              # Select variable for the slopes
-              selectizeInput("plot_slope_var", "Select Variable",
-                             # ensure there is a default selection, make lower case for consistency
-                             tolower(colnames(CO2)), multiple=TRUE, selected=tolower(colnames(CO2)[1])),
-              # Select condition for the slope plot
-              selectizeInput("plot_slope_cond", "Select Features",
-                             # ensure there is a default selection, make lower case for consistency
-                             tolower(colnames(CO2)), multiple=TRUE, selected=tolower(colnames(CO2)[1])),
-              plotOutput("plot_slope"),
-          ),
-          ########## SIMULATE PANEL ##########
-          tabPanel("Simulate", 
-              # SIMULATE
-              # Select condition for the slope plot
-              selectizeInput("simulated_feature_select", "Select Variable to Simulate",
-                             # ensure there is a default selection, make lower case for consistency
-                            tolower(colnames(CO2)), multiple=FALSE, selected=tolower(colnames(CO2)[4])),
-              
-             selectizeInput("simulated_smooth_select", "Select Smooth for Variable",
-                             smooths(model_1), multiple=FALSE),
-              
-              plotOutput("basis_func"),
-          ),
-          ##### COMPARISONS PANEL ##########
-          tabPanel("Comparisons",
-              selectizeInput("comp_seq", "Select var for sequence",
-                             tolower(colnames(CO2)),multiple=FALSE,selected=tolower(colnames(CO2)[4])),
-              
-              selectizeInput("comp_interest", "Select var to compare",
-                             tolower(colnames(CO2)),multiple=FALSE,selected=tolower(colnames(CO2)[4])),
-              
-              selectizeInput("comp_by", "by",
-                             tolower(colnames(CO2)),multiple=TRUE,selected=tolower(colnames(CO2)[4])),
-              
-              plotOutput("comparisons")
+      tabPanel("Welcome",
+          page_fillable(
+            includeMarkdown("markdown/welcome.md")
           )
-        ), # end tabPanel Interpret
-        
+      ), # End Welcoime TabPanel
+      ########### BUILD ##############
+      tabPanel("Load",
+        titlePanel("Load Dataset"),
+        # Build model
+        layout_column_wrap(
+          fileInput('load_upload', 'Choose file to upload'),
+          textInput("load_col_types", "Column Types"),
+          radioButtons("load_separator","Separator: ",choices = c(";",",",":"), selected=",",inline=TRUE),
+          actionButton("load_go_button","Import"),
+          actionButton("load_help_button", "Help")
+        ),
+        DT::dataTableOutput("load_data"),
       ),
-      tabPanel("Design")
-    ),
-    #selectInput("feature", label = "Feature", choices = smooths(model_1)),
-    #plotOutput("plot"),
-    #tableOutput("table")
+      tabPanel("Build",
+          page_fillable(
+            titlePanel("GAM Builder"),
+            h4("GAM Hyperparameters"),
+            # Put method, family and link into the same row
+            layout_column_wrap(
+              selectInput("gam_family", label="Family", choices=getGamFamilies(), selected="Gamma"),
+              # Uses getGamMethods(family) once updated.
+              selectInput("gam_method", label="Method", choices=c(), selected="REML"),
+              # gam_link is updated once a family is selected
+              selectInput("gam_link", label="Link", choices=c()),
+            ),
+            
+            # Put the help buttons in the row below
+            layout_column_wrap(
+              actionButton("build_families_help_button", "Family Help"),
+              actionButton("build_methods_help_button", "Methods Help"),
+              actionButton("build_links_help_button", "Link Help"),
+            ),
+
+            titlePanel("Formula Terms"),
+            # Once the dataset is loaded, choices become avaliable
+            selectInput("build_response", label="Select response variable", choices=c()),
+            
+            # Card which prints the formula preview for the user and allows them to undo a term
+            card(
+              card_header("Formula Preview"),
+              textOutput("build_formula"),
+              textOutput("build_splines"),
+              actionButton("build_undo_button", "Undo")
+            ),
+            
+            # Builds the Card nav set which contains cards for building model formula and terms
+            generateBuildNavsetCardList(),
+            
+            # Card with tabs to add terms to the formula.
+            # As we are building a GAM, we have options for both parametric terms and smooths
+            card(
+              card_header("Operators"),
+              radioButtons("build_parametric_interaction", label="Select Interaction", choices=c("+","-",":","*","^"), inline=TRUE),
+              actionButton("build_operator_add_button", "Add Operator")
+            ),
+            # button to build the model
+            actionButton("build","create"),
+          ) # end mainPanel Build
+      ), # end tabPanel Build
+      
+      # Appraisal Tab Panel. Contains plots and tools for evaluating the model
+      generateAppraiseTabPanel(),
+      
+      ########## INTERPRET ############
+      
+      tabPanel("Interpret",
+        titlePanel("Interpret"),
+        ##### PUT CONFIG HERE #######
+        accordion(
+          accordion_panel(
+            title="Plotting Options",
+            checkboxGroupInput("int_plot_opt_checkbox", "Plotting Options",
+              c("Rug"="rug")
+            ),
+            responseScaleSelector("link_response")
+          ) # End interpret accordion
+        ),
+        # Generates the navigation list for the Interpret panel and it's contents
+        generateInterpretNavList(),
+      ),
+      # Generates the Design tab panel for quick switching between models
+      generateDesignTabPanel(),
+      # This function generates a new UI for the student journey. As such an ID is passed.
+      generateTeachTabPanel(),
+      # References
+      generateRefTabPanel(),
+    ), # End Tabset panel
 )
 
 # Render functions is designed to produce a particular type of output.
 # Often paired with an Output function. e.g. renderPrint will call verbatimtextoutput
 server <- function(input, output, session) {
+  
+  # Student server, runs code for the teach section.
+  studentServer(student_id)
+  
+  ##### TESTING OR TEMPORARY ITEMS #######
+  
+  # Models from Gamair documentation
+  # Builders for 'quickloading' models for testing.
+  observe({
+    # Basic model with two smooths, simple alternative model to the CO2 model
+    model_brain <- gam(medFPQ~s(Y,k=30)+s(X,k=30), data=brain, family=Gamma(link=log))
+    # Set the user data to the brain data to update the UI
+    userData(brain)
+    # Set the active model to the quick built model
+    userModel(model_brain)
+  }) %>% bindEvent(input$quickload_brain)
+  
+  # Builders for 'quickloading' models for testing.
+  observe({
+    # Test tensor term
+    model_brain_te <- gam(medFPQ~te(Y,X,k=10),data=brain,family=Gamma(link=log))
+    # Set the user data to the brain data to update the UI
+    userData(brain)
+    # Set the active model to the quick built model
+    userModel(model_brain_te)
+  }) %>% bindEvent(input$quickload_brain_te)
+  
+  # Builders for 'quickloading' models for testing.
+  observe({
+    # Test ti term
+    model_brain_ti <- gam(medFPQ ~ s(Y,k=10,bs="cr") + s(X,bs="cr",k=10) +
+                            ti(X,Y,k=10), data=brain, family=Gamma(link=log))
+    # Set the user data to the brain data to update the UI
+    userData(brain)
+    # Set the active model to the quick built model
+    userModel(model_brain_ti)
+  }) %>% bindEvent(input$quickload_brain_ti)
   
   # reactive expressions act like functions however will only run the first time called
   # then the output will be cached and only updated if required
@@ -158,136 +222,458 @@ server <- function(input, output, session) {
     get(input$dataset, "package:datasets")
   })
   
-  # Map the smooth name to it's ID
-  feature_mappings <- reactive({
-    mapped_idx = which_smooths(model_1, input$feature)
-  })
-  
-  output$plot <- renderPlot({
-    plot(model_1, select=feature_mappings(), shade=TRUE)
-    abline(h=0, lty='dashed')
-  })
-  
   gam_formula <- reactive({
       typed_word <- input$formula 
   })
   
-  ############### Build #################
-  userModel <- reactive({
-    # user model
-    m <- gam2(formula=as.formula(input$formula),
-                   data = plant, 
-                   method = input$gam_method, 
-                   #family = Gamma(link = "log"))
-                   family = buildFamilyValue(input$gam_family,input$gam_link))
-  }) |> bindEvent(input$build)
+  # Model present by default
+  userModel <- reactiveVal(model_1)
   
-  output$userModelAppraisal <- renderPlot({
-    appraise(userModel(), point_col = "steelblue", point_alpha = 0.4)
-  }) |> bindEvent(userModel())
+  # Map the smooth name to it's ID
+  feature_mappings <- reactive({
+    mapped_idx = which_smooths(userModel(), input$feature)
+  })
+  
+  ########################################
+  ############### DATA ###################
+  ########################################
+  
+  # Load user dataset
+  load_csv <- reactive({
+    req(input$load_upload)
+    if(isTruthy(input$load_col_types)){
+      sb <- paste0("list(",input$load_col_types,")")
+      col_types <- eval(str2expression(sb))
+      df <- vroom::vroom(input$load_upload$datapath, delim=input$load_separator, col_types=col_types) 
+    } else {
+      df <- vroom::vroom(input$load_upload$datapath, delim=input$load_separator)
+    }
+    return(df) 
+  }) %>% bindEvent(input$load_go_button)
+  
+  
+  
+  output$load_data<- DT::renderDataTable({
+    df <- load_csv()
+    userData(df)
+    DT::datatable(df)
+  })
+  
+  # Temporarily have userData set
+  userData <- reactiveVal(plant)
+  
+  # Update UI with new dataset when a new dataset is loaded
+  observeEvent(userData(),{
+    # TODO: is tolower needed? Or do the tolower at when importing columns
+    nm = names(userData())
+    
+    # Response variable selector
+    updateSelectInput(session, "build_response", choices=nm)
+    
+    # Building formula items
+    updateSelectInput(session,"build_covariates_term",choices=nm)
+    updateSelectInput(session,"build_by_term",choices=addDefaultToInputChoices(nm)) 
+    updateSelectInput(session,"build_parametric_term",choices=nm)
+  })
+  
+  # When a new model is created, only offer vars used in the model in the interpret tab
+  observe({
+    mv <- model_vars(userModel())
+    
+    # Get factors for factor only inputs
+    mp <- mapply(function(X) { return(is_factor_term(userModel(),X))}, mv)
+    
+    factors <- mv[mp]
+    
+    # Interpret tab 
+    
+    # Interpret predictions
+    updateSelectInput(session,"plot_pred_cond",choices=mv, selected=mv[1])
+    updateSelectInput(session,"plot_pred_cond_var",choices=mv,selected=mv[1])
+    updateSelectInput(session,"plot_pred_by",choices=factors)
+    
+    # Slopes
+    updateSelectInput(session,"plot_slope_cond_var",choices=mv, selected=mv[1])
+    updateSelectInput(session,"plot_slope_by_var",choices=mv, selected=mv[1])
+    updateSelectInput(session,"plot_slope_cond_cond",choices=mv, selected=mv[1])
+    updateSelectInput(session,"plot_slope_by_by",choices=factors)
+
+    # Basis function plotter
+    updateSelectInput(session,"simulated_feature_select",choices=mv,selected=mv[1])
+    
+    # Comparisons tab
+    updateSelectInput(session,"comp_seq",choices=mv,selected=mv[1])
+    updateSelectInput(session,"comp_interest",choices=mv,selected=mv[1])
+    
+    # Conditional Comparisons
+    updateSelectInput(session,"comp_cond_var",choices=mv,selected=mv[1])
+    updateSelectInput(session,"comp_cond_conc",choices=mv,selected=mv[1])
+    
+    # Adv. Conditional Comparisons
+    updateSelectInput(session,"comp_cond_var_adv",choices=mv)
+    updateSelectInput(session,"comp_cond_cond_adv",choices=mv)
+    
+    # Marginal Comparisons Inputs
+    updateSelectInput(session,"comp_by_by",choices=mv)
+    updateSelectInput(session,"comp_by_interest",choices=mv,selected=mv[1])
+    
+    # No default selection for 'by' in comparisons
+    updateSelectInput(session,"comp_dg_var",choices=mv,selected=mv[1])
+  }) %>% bindEvent(userModel())
+  
+  
+  #######################################
+  ############### Build #################
+  #######################################
+  
+  # Contains all the smooth terms for the user defined model. e.g. s(x), s(x2)
+  # TODO: Update to all terms
+  build_terms <- reactiveVal(c())
+  
+  # When the model is updated, update UI for smooth selection
+  observeEvent(userModel(),{
+    m <- userModel()
+    updateSelectInput(session,"simulated_smooth_select",choices=smooths(m))
+    updateSelectInput(session,"interpret_smooth_select",choices=smooths(m))
+  })
+  
+  # Variable which holds the user defined model.
+  # Bound to the input button, so will only be defined once a user has built their model.
+  buildUserModel <- reactive({
+    
+    # Build the formula beginning with mandatory values and followed by params
+    term_string <- paste(build_terms(), collapse='')
+    form_string <- paste(input$build_response, "~", term_string, collapse='')
+    (fmla <- as.formula(paste(input$build_response, " ~ ", paste(build_terms(), collapse=''))))
+    # input$formula
+    m <- gam2(formula=fmla,
+                   data = userData(), 
+                   method = input$gam_method, 
+                   family = buildFamilyValue(input$gam_family,input$gam_link))
+    userModel(m)
+  }) |> bindEvent(input$build)
   
   # Update the options for link functions based on the distribution family selected.
   observeEvent(input$gam_family,{
     links <- getValidLinkFunction(input$gam_family)
-    updateSelectInput(session,"gam_link",choices=links)
+    methods <- getGamMethods(input$gam_family)
+    # First item is the canonical link, select by default
+    updateSelectInput(session,"gam_link",choices=links, selected=links[1])
+    updateSelectInput(session,"gam_method",choices=methods, selected="REML")
   })
   
-  #output$userModelSummary <- renderTable({
-  #  summary(userModel())
-  #})
-  
-    ######### PART 1 - PLOT PREDICTIONS
-  output$plot_pred <- renderPlot({
-    # ensure that feature selections are lower case
-    plot_predictions(model_1,condition=c({input$plot_pred_cond}),type=input$link_response)+
-      labs(y=str_c("Linear predictor (",input$pred_link_response," scale)"), title=paste("Average smooth effect of ", {input$plot_pred_cond}), subtitle="aggregated across treatment and types")
+  # Observe when the dataset is loaded, then update response and formula options
+  # based on the datasets columns
+  #TODO Update this or decide to delete
+  observeEvent(input$dataset,{
+    updateSelectInput(session, "build_response", choices=names(userData()))
   })
   
-  ######### PART 2 - PLOT SLOPES
+  ########################################
+  ###### Formula builder observers #######
+  ########################################
   
-  #Input for conditions
-  output$plot_slope <- renderPlot({
-    plot_slopes(model_1, variables=c({input$plot_slope_var}), condition=c({input$plot_slope_cond}), type=input$link_response) +
-      labs(y = "1st Derivative of linear predictor", title = "Conditioal slopes of the concentration effect", subtitle="Per treatment, per type")
+  # Observe when the smooth button is pressed, add the smooth to the list.
+  observeEvent(input$build_add_smooth,{
+    # build the smooth
+    smooth <- buildSmooth({input$build_smooth_term},{input$build_covariates_term},{input$build_nknots},{input$build_penalised},{input$build_smooth_classes},by=input$build_by_term)
+    # Append the new smooth to the list of smooths for the model
+    msmooths <- append(build_terms(), smooth)
+    # set the value of the build_terms reactive var to the new list with the appended smooth
+    build_terms(msmooths)
   })
   
+  # Observe when the add operator button is added
+  observeEvent(input$build_operator_add_button, {
+    operator <- paste0(" ", input$build_parametric_interaction, " ")
+    moperator <- append(build_terms(),operator)
+    build_terms(moperator)
+  })
   
-  ######## PART 3 - SIMULATING FROM fitted GAM MODELS
+  # When the add parametric term button is pressed, add it to the list of terms.
+  observeEvent(input$build_add_parametric_button, {
+    para <- input$build_parametric_term
+    mpara <- append(build_terms(),para)
+    build_terms(mpara)
+  })
+  
+  # When the undo button is pressed, remove the last item from the formula list
+  observeEvent(input$build_undo_button, {
+    undone <- build_terms()[-length(build_terms())]
+    build_terms(undone)
+  })
+  
+  #########################################
+  ##### Formula builder text outputs ######
+  #########################################
+  
+  output$build_splines <- renderText({
+    build_terms()
+  })
+  ################################
+  ########## Appraisal ###########
+  ################################
+  
+  # Render the output of the gratia's appraise function on the user model
+  output$userModelAppraisal <- renderPlot({
+    if(input$appraise_gratia_simulate){
+      appraise(userModel(), point_col = "steelblue", point_alpha = 0.4, method="simulate")
+    } else {
+      appraise(userModel(), point_col = "steelblue", point_alpha = 0.4)
+    }
+  })
+  
+  output$userModelSummary <- renderPrint({
+    summary(userModel())
+  }) |> bindEvent(userModel())
+  
+  output$userModelGamCheck <- renderPrint({
+    gam.check(userModel())
+  }) |> bindEvent(userModel())
+  
+  ##############################
+  ########## INTERPRET #########
+  ##############################
+  
+  ########################################
+  ####### Interpret UI Observers #########
+  ########################################
+  
+  observe({
+    buildModalDialog("Plot Predictions",getPlotPredHelpText())
+  }) %>% bindEvent(input$plot_pred_help_button)
+  
+
+  ##############################
+  ########### PLOTS ############
+  ##############################
+  
+  ######## PLOT BASIC SMOOTHS AND BASIS FUNCTIONS ############
   
   # Map the smooth name to it's ID for simulation
   feature_mappings_simu <- reactive({
-    mapped_idx = which_smooths(model_1, input$simulated_smooth_select)
+    mapped_idx = which_smooths(userModel(), input$simulated_smooth_select)
+  })
+  
+  output$plot_gam <- renderPlot({
+    smidx <- which_smooths(userModel(), input$interpret_smooth_select)
+    draw(userModel(), select=smidx)
   })
   
   # plot the basis functions
   output$basis_func <- renderPlot({
-    selection <- select(plant, {input$simulated_feature_select})
-    # check to see if numeric or factor which will impact sequence generation
-    selection_dtype <- lapply(plant,class)[[input$simulated_feature_select]]
-    
-    beta <- coef(model_1)
-    
-    # Sequences for numerics and factors must be treated separetly
-    if (selection_dtype=="factor"){
-      seq <- unique(selection)
-      seq <- lapply(seq, as.character)[[1]]
-    } else { #numeric
-      seq <- seq(from=min(selection),max(selection), length.out=500)
-    }
-    
-    # Call datagrid wrapper for easier function calls
-    dg <- datagrid2("{input$simulated_feature_select}" := seq,model=model_1)
-    # get predictions for the datagrid
-    newXp <- predict(model_1, type='lpmatrix',newdata=dg)
-    
-    # TODO: Find out smooth selection for a given var
-    
-    # Find which coefficients belong to the first smooth of conc
-    # from the first para of the 2nd smooth to the last, get the coefficients
-    conc_coefs <- model_1$smooth[[feature_mappings_simu()]]$first.para:model_1$smooth[[feature_mappings_simu()]]$last.para
-    
-    newXp_adj <- matrix(0, ncol = NCOL(newXp), nrow = NROW(newXp))
-    newXp_adj[,conc_coefs] <- newXp[, conc_coefs]
-    # do.call do.call(what, args, quote = FALSE, envir = parent.frame()) 
-    # constructs and executes a function
-    # do - rowbind with argument of a sequence generation for conc_coef
-    plot_dat = do.call(rbind,lapply(seq_along(conc_coefs), function(basis){
-      #paste0 concatenate vectors after converting to char
-      df2(basis_func=paste('bs',basis),"{input$simulated_feature_select}":=seq
-          , value=newXp_adj[, conc_coefs[basis]] * beta[conc_coefs[basis]])
-    }))
-    
-    ftcol <- eval_tidy({input$simulated_feature_select})
-    # Factor do a different 
-    if(selection_dtype=="factor"){
-      ggplot(plot_dat,aes(x=basis_func, y=value, fill=.data[[ftcol]])) +
-        geom_bar(stat="identity", position=position_dodge())+
-        labs(y='Basis function value')
+    smidx <- which_smooths(userModel(), input$simulated_smooth_select)
+    draw(basis(model_1, select=smidx))
+  })
+  
+  # TODO: Update title and subtitles
+  # TODO: Conider 'exclude' which can be passed when the userModel is a gam (which it always will be in this context)
+  
+  ########## PLOT PREDICTIONS ###############
+  
+  #### Generate UI elements based on options
+  
+  output$plot_pred <- renderPlot({
+    # ensure that feature selections are lower case
+    getPlotPredictions(userModel(),c({input$plot_pred_cond}),
+      input$link_response,checkPlotOption("rug",input$int_plot_opt_checkbox),by=input$plot_pred_by) +
+      labs(y=str_c("Linear predictor (",input$pred_link_response," scale)"), title=paste("Average smooth effect of ", {input$plot_pred_cond}), subtitle="aggregated across treatment and types")
+  })
+  
+  output$plot_pred_cond_advanced <- renderPlot({
+    sb <- paste0("list(",input$plot_pred_cond_topt,")")
+    cond_list <- eval(str2expression(sb))
+    getPlotPredictions(userModel(),cond_list,
+                       input$link_response,checkPlotOption("rug",input$int_plot_opt_checkbox),by=input$plot_pred_by) +
+      labs(y=str_c("Linear predictor (",input$pred_link_response," scale)"), title=paste("Average smooth effect of ", {input$plot_pred_cond}), subtitle="aggregated across treatment and types")
+  }) %>% bindEvent(input$plot_pred_cond_add)
+  
+  ######### PART 2 - PLOT SLOPES ###########
+  
+  # TODO: Update subtitle
+  #Input for conditions
+  output$plot_slope_cond <- renderPlot({
+    req(input$plot_slope_cond_var)
+    req(input$plot_slope_cond_cond)
+    plot_slopes(userModel(), variables=c({input$plot_slope_cond_var}), condition=c({input$plot_slope_cond_cond}), slope=input$plot_slope_cond_slope, type=input$link_response,
+      rug=checkPlotOption("rug",input$int_plot_opt_checkbox)) +
+      labs(y = "1st Derivative of linear predictor", title = "Conditional slopes of the concentration effect", subtitle="Per treatment, per type")
+  })
+  
+  # TODO: Update subtitle
+  #Input for conditions
+  output$plot_slope_by <- renderPlot({
+    req(input$plot_slope_by_by)
+    req(input$plot_slope_by_var)
+    plot_slopes(userModel(), variables=c({input$plot_slope_by_var}), by=c({input$plot_slope_by_by}), slope=input$plot_slope_by_slope, type=input$link_response,
+                rug=checkPlotOption("rug",input$int_plot_opt_checkbox)) +
+      labs(y = "1st Derivative of linear predictor", title = "Conditional slopes of the concentration effect", subtitle="Per treatment, per type")
+  })
+  
+  
+  ###########################
+  ###### COMPARISONS ########
+  ###########################
+  
+  # Holds the datagrid
+  comp_dg <- reactiveVal()
+  # Text used to generate the datagrid
+  comp_dg_arg <- reactiveVal()
+  
+  # When a variable is selected to generate a sequence for, get the valid generation methods
+  observe({
+    selection_dtype <- lapply(userData(),class)[[input$comp_dg_var]]
+    updateSelectInput(session,"comp_dg_method",choices=getValidDataGridMethods(selection_dtype))
+  }) %>% bindEvent(input$comp_dg_var, ignoreInit=TRUE) # ignoreInit=TRUE is important here as input$comp_dg_var does not have an initial value (c())
+  
+  ######## Adv Condition ############
+  
+  
+  output$comp_adv_cond_plot <- renderPlot({
+    # Comparisons is tricky. For the basic case, we want a c()
+    # But when specific values are defined (e.g. text input) we want a list 
+    if(isTruthy(input$comp_cond_var_adv)){
+      var_list <- {input$comp_cond_var_adv}
     } else {
-      #Eval the input and ppass it in using the .data pronoun
-      # This is required as the user input is a char vec, not the data object itself
-      ggplot(plot_dat,aes(x=.data[[ftcol]], y=value, col=basis_func)) +
-        geom_line(linewidth=0.75)+theme(legend.position='none') +
-        labs(y='Basis function value')
+      sbc <- paste0("list(",input$comp_cond_text_adv_var,")")
+      var_list <- eval(str2expression(sbc))
     }
-  })
-  
-  # COMPARISONS
-  
-  output$comparisons <- renderPlot({
-    selection <- select(plant, {input$comp_seq})
-    seq <- seq(from=min(selection),max(selection), length.out=500)
-    plot_comparisons(model_1, newdata=datagrid2("{input$comp_seq}":=seq,treatment=unique,type=unique),
-     variables={input$comp_interest},
-     by=c({input$comp_seq}, "type"),
-     type={input$link_response}) +
-      geom_hline(yintercept=0,linetype='dashed') +
-      labs(y="Estimated difference",
-           title="Difference between treatment levels",
-           subtitle="Chilled - nonchilled, per type")
-  })
-  
-}
 
+    if(isTruthy(input$comp_cond_cond_adv)){
+      cond_list <- {input$comp_cond_cond_adv}
+    } else {
+      sbv <- paste0("list(",input$comp_cond_text_adv_cond,")")
+      cond_list <- eval(str2expression(sbv))
+    }
+    
+    # Use the user defined datagrid if provided
+    if(isTruthy(comp_dg())){
+      plot_comparisons(userModel(), variables=var_list,
+                       condition=cond_list,
+                       comparison=input$comp_opt_comp,
+                       newdata=comp_dg(),
+                       type={input$link_response}) +
+        geom_hline(yintercept=0,linetype='dashed')
+    } else {
+      plot_comparisons(userModel(), variables=var_list,
+                       condition=cond_list,
+                       comparison=input$comp_opt_comp,
+                       type={input$link_response}) +
+        geom_hline(yintercept=0,linetype='dashed')
+    }
+
+
+  }) %>% bindEvent(input$comp_adv_cond_plot_button)
+    
+  # When a new variable is added to the comparisons datagrid, add it to the list
+  observe({
+    req(input$comp_dg_text)
+    # If the raw text is empty, then use the provided method
+    sb <- paste0("datagrid2(model=userModel(),",input$comp_dg_text,",grid_type=\"",input$grid_type,"\")")
+    # Need to parse and then eval to get the datagrid object back
+    dg <- eval(str2expression(sb))
+    comp_dg_arg(input$comp_dg_text)
+    # Must set the reactive value as so
+    comp_dg(dg)
+  }) %>% bindEvent(input$comp_dg_button)
+  
+  # Clear the datagrid variables
+  observe({
+    comp_dg_arg(NULL)
+    comp_dg(NULL)
+  }) %>% bindEvent(input$comp_dg_clear)
+  
+  # Text output of current plan
+  output$comp_text <- renderPrint({
+    comp_dg_arg()
+  })
+  
+  ################################
+  ###### COMPARISONS PLOTS #######
+  ################################
+  
+  # Basic marginal comparisons plot.
+  output$comp_by_plot <- renderPlot({
+    req(input$comp_by_interest)
+    req(input$comp_by_by)
+    
+    if(isTruthy(comp_dg())){
+      plot_comparisons(userModel(),
+                       variables = c({input$comp_by_interest}),
+                       by=c({input$comp_by_by}),
+                       comparison=input$comp_opt_comp,
+                       type=input$link_response,
+                       newdata=comp_dg()
+      ) + geom_hline(yintercept = 0, linetype = 'dashed')
+    } else {
+      plot_comparisons(userModel(),
+                       variables = c({input$comp_by_interest}),
+                       by=c({input$comp_by_by}),
+                       type=input$link_response,
+                       comparison=input$comp_opt_comp
+      ) + geom_hline(yintercept = 0, linetype = 'dashed')
+    }
+
+  })
+  
+  # Basic Conditional Comparisons plot
+  output$comp_cond_plot <- renderPlot({
+    req(input$comp_cond_var)
+    req(input$comp_cond_conc)
+    # If the user has provided a datagrid, use it.
+    if(isTruthy(comp_dg())){
+      plot_comparisons(userModel(),
+                       variables=c({input$comp_cond_var}),
+                       condition=c({input$comp_cond_conc}),
+                       comparison=input$comp_opt_comp,
+                       newdata=comp_dg()
+      )
+    } else {
+      plot_comparisons(userModel(),
+                       variables=c({input$comp_cond_var}),
+                       condition=c({input$comp_cond_conc}),
+                       comparison=input$comp_opt_comp
+      )
+    }
+
+  })
+  
+  ########### HELP MENU ITEMS #############
+  observe({
+    showModal(
+      modalDialog(
+        includeMarkdown("markdown/build_smooth_term_help.md"),
+        title="Smooth Term Help",
+        easyClose=TRUE
+      )
+    )
+    #buildModalDialog("Smooth Terms",getPlotPredHelpText())
+  }) %>% bindEvent(input$build_smooth_term_help)
+  
+  observe({
+    showModal(
+      modalDialog(
+        withMathJax(includeMarkdown("markdown/build_link_help.md")),
+        title="Link Function Help",
+        size='l',
+        easyClose=TRUE
+      )
+    )
+  }) %>% bindEvent(input$build_links_help_button)
+  
+  observe({
+    showModal(
+      modalDialog(
+        withMathJax(includeMarkdown("markdown/load_help.md")),
+        title="Load Data Help",
+        size="l",
+        easyClose=TRUE
+      )
+    )
+  }) %>% bindEvent(input$load_help_button)
+}
 # Run the application 
+
+# Optional runGadget
+#runGadget(ui, server, viewer = dialogViewer("InvestiGAM", width = 1200, height = 1800))
 shinyApp(ui = ui, server = server)

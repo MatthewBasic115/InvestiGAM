@@ -1,0 +1,9 @@
+# Link Function Help
+
+Link functions are what allow generalised models such as GAMs and GLMs to use different families. In order to estimate the expected value of a response $E(Y_i) \equiv \mu_i$ given a linear predictor $\eta \equiv X \beta$, the linear predictor must return an output which is valid for the distribution of the response. When the response family is Gaussian, $\mu_i$ can take the range of $(-\infty,\infty)$. This already aligns with the output of the linear predictor which can also take the range of $(-\infty,\infty)$. This is the case for standard linear regression where the family is Gaussian.
+
+However, what if $E(Y_i|X)$ belongs to a different family? Assume we are trying to estimate the number of sheep in a paddock. When modelling count data, the Poisson distribution is often appropriate. For this family, $\mu_i$ can never be negative (if counting sheep in paddocks, the expected number of sheep given a paddock is never negative). If a linear predictor was used too estimate $\mu_i$ in this instance, it could provide a negative number. In this case the range of $\eta$ which is $(-\infty,\infty)$ is not valid for $\mu_i$ which requires $(0,\infty)$
+
+Link functions transform the linear predictor so that they are valid for a given family. In the case of GLMs and GAMs (and this application) these are exponential family distributions. If we define a link function _g_ then we can create a generalized linear model of the form $g(\mu_i)=X_i \beta$ where the link function transforms the linear predictor so it is appropriate for the model's family.
+
+This raises the question of which link functions are viable for which families. For the purpose of this application, the canonical link functions are recommended and will be automatically populated when you select a family.
