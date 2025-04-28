@@ -4,6 +4,8 @@ Arel-Bundock, V. (2024) “How to interpret statistical models in R and Python�
 
 Arel-Bundock V, Greifer N, Heiss A (2024). “How to Interpret Statistical Models Using marginaleffects for R and Python.” _Journal of Statistical Software_, 111(9), 1-32. doi:10.18637/jss.v111.i09 https://doi.org/10.18637/jss.v111.i09.
 
+Clark, N. (2024, May 2). How to interpret and report nonlinear effects from Generalized Additive Models. GAMbler. https://ecogambler.netlify.app/blog/interpreting-gams/
+
 Hastie, T., & Tibshirani, R. (1986). Generalized Additive Models. _Statistical Science_, 1(3), 297–310. https://doi.org/10.1214/ss/1177013604
 
 Hester J, Wickham H, Bryan J (2023). vroom: Read and Write Rectangular Text Data Quickly. R package version 1.6.5, https://github.com/tidyverse/vroom, https://vroom.r-lib.org. 
