@@ -641,14 +641,14 @@ server <- function(input, output, session) {
     # Use the user defined datagrid if provided
     if(isTruthy(comp_dg())){
       plot_comparisons(userModel(), variables=var_list,
-                       by=cond_list,
+                       by=by_list,
                        comparison=input$comp_opt_comp,
                        newdata=comp_dg(),
                        type={input$link_response}) +
         geom_hline(yintercept=0,linetype='dashed')
     } else {
       plot_comparisons(userModel(), variables=var_list,
-                       by=cond_list,
+                       by=by_list,
                        comparison=input$comp_opt_comp,
                        type={input$link_response}) +
         geom_hline(yintercept=0,linetype='dashed')
