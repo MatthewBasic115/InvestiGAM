@@ -97,9 +97,6 @@ generateTeachTabPanel <- function(){
                nav_panel("4. Interpret",
                  generateTeachInterpretPage(),
                ), # End Interpret
-               nav_panel("5. General Help"
-                 
-               ), # end General Help
              ), # end navset_pill
            ) # end page fluid
   ) # end teach tabpanel
