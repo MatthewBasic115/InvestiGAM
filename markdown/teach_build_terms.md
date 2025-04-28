@@ -10,7 +10,7 @@ This lets you add the standard R operators to your formula.
 
 ### Parametric Terms
 
-This simple dropdown allows you to add parametric terms to your GAM. You can select a given covariate and TODO (number e.g. plant^2).
+This simple dropdown allows you to add parametric terms to your GAM as you would for a typical parametric model.
 
 ### Raw Formula
 

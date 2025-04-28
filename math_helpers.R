@@ -144,10 +144,12 @@ getSmoothClasses <- function(){
   return(smooth_classes)
 }
 
-buildConditionList <- function(df){
-  
+getFactorsForModel <- function(model){
+  mv <- model_vars(model)
+  mp <- mapply(function(X) { return(is_factor_term(model,X))}, mv)
+  factors <- mv[mp]
+  return(factors)
 }
-
 
 #' Title getValidDataGridMethods
 #' 
@@ -173,8 +175,14 @@ getValidCondFunctions <- function(type){
 getValidCompareAdvVarMethods <- function(type){
   if(type=="factor") return(c("reference", "sequential", "pairwise", "all", "revpairwise", "revsequential", "revreference", "minmax"))
   if(type=="numeric") return(c("reference", "sequential", "pairwise", "all", "revpairwise", "revsequential", "revreference", "minmax", "sd", "2sd"))
+  # If in doubt, return numeric
+  return(c("reference", "sequential", "pairwise", "all", "revpairwise", "revsequential", "revreference", "minmax", "sd", "2sd"))
 }
 
+
+#' getValidDataGridTypes
+#'
+#' @returns the three valid arguments for datagrid() grid_type argument
 getValidDataGridTypes <- function(){
   types <- c("mean_or_mode", "balanced", "counterfactual")
   return(types)

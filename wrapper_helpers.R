@@ -23,3 +23,15 @@ df2 <- function(...){
 gam2 <- function(...){
   do.call("gam",list2(...))
 }
+
+# Error function helper
+showModalErrorMessage <- function(e){
+  showModal(
+    modalDialog(
+      title="Error",
+      size="l",
+      easyClose=TRUE,
+      e
+    )
+  )
+}

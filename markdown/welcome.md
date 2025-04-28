@@ -1,8 +1,8 @@
 # Welcome
 
-Welcome to SplineSplitter (or InvestiGAM? Oak?)!
+Welcome to InvestiGAM (or Spline Seer?)!
 
-Application is a Shiny application which aims to teach it's users about GAMs and provide tools to aid in interpreting their output. The GAMs are built using Simon Wood's mgcv package and the interpretation tools make use of the marginaleffects package. InvestiGAM consists of four primary components: build, appraise, interpret and learn.
+InvestiGAM is a Shiny application which aims to teach it's users about Generalised Additive Models (GAMs) and provide tools to aid in interpreting their output. The GAMs are built using Simon Wood's mgcv package (Wood, 2025) and the interpretation tools make use of the marginaleffects package (Arel-Bundock et al., 2024). InvestiGAM consists of four primary components: build, appraise, interpret and learn.
 
 Please rezise the application window to your convinience.
 
@@ -24,9 +24,9 @@ Other helpful tools from mgcv such as gam.check() and summary are also provided.
 
 The Interpret tab uses the marginaleffects package to provide tools for interpreting your GAM. For beginners, this allows you to learn to interpret GAMs first without needing to learn additional R packages. For experienced users, this allows you to quickly visualise and interpret without the need to generate swathes of boilerplate code. More information is provided on the introduction page for the section.
 
-### Teach
+### Learn
 
-The teach section is designed for students who are using this application as a learning tool. It introduces core GAM concepts at a high level and walks you through an example to get you started. This introduction aims to provide a conceptual understanding of core GAM components rather then teach technical details. As such, if you are not learning underlying theory through coursework, then I reccomend Simon Wood's fantastic _Generalized Additive Models: An Introduction with R_ which was the source material for the teaching section in this module.
+The learn section is designed for students who are using this application as a learning tool. It introduces core GAM concepts at a high level and how to use InvestiGAM to build and interpret GAMs. This introduction aims to provide a conceptual understanding of core GAM components rather then teach technical details. As such, if you are not learning underlying theory through coursework, then I reccomend Simon Wood's fantastic _Generalized Additive Models: An Introduction with R_ which was the source material for the teaching section in this module.
 
 ### Important Notes
 
@@ -37,9 +37,9 @@ As InvestiGAM is designed to act as a teaching tool, it has a limited scope in s
 
 The marginaleffects package (Arel-Bundock, 2024) is the core of the Interpret module. If you would like to learn how to generate the plots and simulations used in this application, then please access the marginaleffects website seen in the Citations below.
 
-Simon Wood is the creator of the mgcv package and the book  _Generalized Additive Models: An Introduction with R_ (Wood, 2017) which s the primary source of the teaching material provided in this application. This application would not be possble without these two resources.
+Simon Wood is the creator of the mgcv package and the book  _Generalized Additive Models: An Introduction with R_ (Wood, 2017) which s the primary source of the teaching material provided in this application. This application would not be possble without these two resources. Thank you Simon!
 
-Thank you to Dr. Nick Clark at the University of Queensland for sponsoring and supervising this project.
+Thank you to Dr. Nick Clark at the University of Queensland for supervising, guiding and reviewing this project.
 
 ### Citations
 
