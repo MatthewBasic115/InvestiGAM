@@ -11,7 +11,7 @@ GLMs attempt to generalise the linear model such that $E(Y_i)$ can belong to mem
 
 ### Link Function
 
-The link function $g$ is defined such that $g(\mu_i) = X_i\beta$ (Wood, 2017, p. 101). The link function chosen for a model then depends on the distribution family chosen for the GLM. For the purposes of this application, it is recommended that you use the canonical link function for a given distribution. This will be automatically selected when you choose your family when building your model. A table has also been provided in the accordion below for reference.
+The link function $g$ is defined such that $g(\mu_i) = X_i\beta$ (Wood, 2017, p. 101). The link function chosen for a model then depends on the distribution family chosen for the GLM. For the purposes of this application, it is recommended that you use the canonical link function for a given distribution. This will be automatically selected when you choose your family when building your model. Note that in some cases such as the Gamma distribution, the log function is used rathen the canonical inverse function. Choosing a non-canonical link function is perfectly acceptable so long as it is valid for a given distribution and you understand how to interpret it's results.
 
 
 ### Fitting

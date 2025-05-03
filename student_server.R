@@ -1,11 +1,65 @@
+
 #
-# Code in this section is adapted from Wood (2017, p.164-165) to allow interaction with the number of knots.
-# Please see Reference list for full citation.
-#
-studentServer <- function(id){
+studentServer <- function(id, page_len){
   data(engine);
+  
+  # preload the C02 dataset
+  # load C02 dataset
+  data(CO2, package = "datasets")
+  
+  # manipulations for modelling
+  plant <- CO2 |>
+    as_tibble() |>
+    rename(plant = Plant, type = Type, treatment = Treatment) |>
+    mutate(plant = factor(plant, ordered = FALSE))
+  
+  # fit model - from GAMbler blog
+  # Problems with mvgam
+  model_1 <- gam(uptake ~ treatment * type + 
+                   s(plant, bs = "re") +
+                   s(conc, by = treatment, k = 7),
+                 data = plant, 
+                 method = "REML", 
+                 family = Gamma(link = "log"))
+  
   moduleServer(id, function(input,output,session){
-    # Generate the graph.
+    
+    ###### Student Journey ######
+      
+    # Appraise
+    output$userModelSummary <- renderPrint({
+      summary(model_1)
+    })
+    
+    output$userModelGamCheck <- renderPrint({
+      gam.check(model_1)
+    })
+    
+    output$userModelAppraisal <- renderPlot({
+      appraise(model_1, point_col = "steelblue", point_alpha = 0.4, method="simulate")
+    })
+    
+    # Render Datatable
+    output$example_data<- DT::renderDataTable({
+      DT::datatable(plant)
+    })
+    
+    # Functions sourced from Shiny Book to allow for page changes for the Wizard.
+    changePage <- function(from, to) {
+      observeEvent(input[[paste0("go_", from, "_", to)]], {
+        updateTabsetPanel(session, "wizard", selected = paste0("page_", to))
+      })  
+    }
+    ids <- seq_len(page_len)
+    lapply(ids[-1], function(i) changePage(i, i - 1))
+    lapply(ids[-page_len], function(i) changePage(i, i + 1))
+    
+    # End Shiny page change functions
+    
+    ###### LEARN SECTION #########
+    
+    # Code in this section is adapted from Wood (2017, p.164-165) to allow interaction with the number of knots.
+    # Generate the graph from Wood (2017, p.164)
     output$plot_knot <- renderPlot({
       # size data
       ## generate 6 evenly spaced knots
@@ -26,6 +80,12 @@ studentServer <- function(id){
     })
   })
 }
+
+
+
+
+# Code in this section is directly sourced from Wood (2017, p.164-165).
+# Please see Reference list for full citation.
 
 # Write an R function defining b_j(x)
 tf <- function(x,xj,j) {
@@ -51,3 +111,5 @@ tf.X <- function(x,xj) {
   }
   X
 }
+
+## END Wood (2017) Code

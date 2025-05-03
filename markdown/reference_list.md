@@ -4,7 +4,11 @@ Arel-Bundock, V. (2024) “How to interpret statistical models in R and Python�
 
 Arel-Bundock V, Greifer N, Heiss A (2024). “How to Interpret Statistical Models Using marginaleffects for R and Python.” _Journal of Statistical Software_, 111(9), 1-32. doi:10.18637/jss.v111.i09 https://doi.org/10.18637/jss.v111.i09.
 
+Carpenter B., Gelman A., Hoffman M. D., Lee D., Goodrich B., Betancourt M., Brubaker M., Guo J., Li P., and Riddell A. (2017). Stan: A probabilistic programming language. _Journal of Statistical Software._ 76(1). DOI: https://doi.org/10.18637/jss.v076.i01
+
 Clark, N. (2024, May 2). How to interpret and report nonlinear effects from Generalized Additive Models. GAMbler. https://ecogambler.netlify.app/blog/interpreting-gams/
+
+Clark, N.J., Wells, K. (2023). Dynamic Generalized Additive Models (DGAMs) for forecasting discrete ecological time series. _Methods in Ecology and Evolution._ DOI: https://doi.org/10.1111/2041-210X.13974
 
 Hastie, T., & Tibshirani, R. (1986). Generalized Additive Models. _Statistical Science_, 1(3), 297–310. https://doi.org/10.1214/ss/1177013604
 

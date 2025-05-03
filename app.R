@@ -21,6 +21,7 @@ library(rlang)
 library(bslib)             # Bootstrap library for Shiny layouts
 library(gamair)            # Contains datasets useful for learning GAMs
 library(markdown)          # Allows for the use of markdown pages in the application
+library(mvgam)             # Conditional Effects Plot
 source("ui_helpers.R")
 source("wrapper_helpers.R")
 source("math_helpers.R")
@@ -168,7 +169,7 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   
   # Student server, runs code for the teach section.
-  studentServer(student_id)
+  studentServer(student_id, 4)
   
   ##### TESTING OR TEMPORARY ITEMS #######
   
@@ -455,8 +456,9 @@ server <- function(input, output, session) {
     draw(basis(model_1, select=smidx))
   })
   
-  # TODO: Update title and subtitles
-  # TODO: Conider 'exclude' which can be passed when the userModel is a gam (which it always will be in this context)
+  output$plot_gam_condeff <- renderPlot({
+    mvgam::conditional_effects(userModel(), type=input$pred_link_response, rug=checkPlotOption("rug",input$int_plot_opt_checkbox))
+  })
   
   ########## PLOT PREDICTIONS ###############
   
@@ -465,7 +467,7 @@ server <- function(input, output, session) {
   output$plot_pred <- renderPlot({
     # ensure that feature selections are lower case
     getPlotPredictions(userModel(),c({input$plot_pred_cond}),
-      input$link_response,checkPlotOption("rug",input$int_plot_opt_checkbox),by=input$plot_pred_by) +
+      input$link_response,rug=checkPlotOption("rug",input$int_plot_opt_checkbox),by=input$plot_pred_by) +
       labs(y=str_c("Linear predictor (",input$pred_link_response," scale)"), title=paste("Average smooth effect of ", {input$plot_pred_cond}), subtitle="aggregated across treatment and types")
   })
   
@@ -473,7 +475,7 @@ server <- function(input, output, session) {
     sb <- paste0("list(",input$plot_pred_cond_topt,")")
     cond_list <- eval(str2expression(sb))
     getPlotPredictions(userModel(),cond_list,
-                       input$link_response,checkPlotOption("rug",input$int_plot_opt_checkbox),by=input$plot_pred_by) +
+                       input$link_response,rug=checkPlotOption("rug",input$int_plot_opt_checkbox),by=input$plot_pred_by) +
       labs(y=str_c("Linear predictor (",input$pred_link_response," scale)"), title=paste("Average smooth effect of ", {input$plot_pred_cond}), subtitle="aggregated across treatment and types")
   }) %>% bindEvent(input$plot_pred_cond_add)
   

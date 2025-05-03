@@ -111,7 +111,7 @@ generateInterpretTabPanel <- function(){
        includeMarkdown("markdown/interpret_intro_text.md"),
      ),
       ########## BASIS PANEL ##########
-     tabPanel("Smooth Plots", 
+     tabPanel("Partial Effect of Smooths", 
        # SIMULATE
        # Select condition for the slope plot
        # TODO: Talk to Nick and see if this should be deleted
@@ -120,7 +120,10 @@ generateInterpretTabPanel <- function(){
        selectizeInput("interpret_smooth_select", "Select Smooth to Plot", c(), multiple=FALSE),
        plotOutput("plot_gam"),
       ),
-      ##########   PANEL ##########
+      tabPanel("Condtional Effect of Smooths",
+        plotOutput("plot_gam_condeff")
+      ),
+      ##########  BASIS FUNCTIONS PANEL ##########
       tabPanel("Basis Plots", 
        # SIMULATE
        # Select condition for the slope plot
@@ -131,7 +134,8 @@ generateInterpretTabPanel <- function(){
        
        plotOutput("basis_func"),
       ),
-      ########### PREDICTIONS PANEL ###########################
+      ########### QUICK NICK PLOTS ##############
+      ########### PREDICTIONS PANEL #############
       tabPanel("Predictions", 
         titlePanel("Plot Predictions"),
         actionButton("plot_pred_help_button","Help"),

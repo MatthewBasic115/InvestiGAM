@@ -18,11 +18,3 @@ getPlotPredictions <- function(model, cond, type, rug, by){
   # This will error but I don't have a better solution currently
   return(plot_predictions(model,condition=cond, type=type, rug=rug, by=by))
 }
-
-
-#' getValidSlopeFunction
-#'
-#' @returns Valid slopes as per marginaleffects package.
-getValidSlopeFunctions <- function(){
-  return(c("dydx", "eyex", "eydx", "dyex"))
-}

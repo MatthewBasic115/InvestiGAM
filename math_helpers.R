@@ -2,6 +2,14 @@
 ### This file contains functions for data manipulation.
 ###
 # Get list of valid families
+
+
+#' getGamFamilies
+#' 
+#' Returns a list of valid GAM families that can be used in the application.
+#' This is those supported by mgcv with some exclusions.
+#'
+#' @returns Valid subset of families supported by mgcv offered by the GUI
 getGamFamilies <- function(){
   # Families in GLM from family
   famList <- c("binomial","guassian","Gamma","inverse.guassian","poisson","quasi","quasibinomial","quasipoisson",
@@ -21,7 +29,7 @@ getGamFamilies <- function(){
 #' Title getGamMethods
 #' 
 #' Gets valid smooth parameter estimator for a given distribution family
-#' Some that are not explicitly suppported are still in the list.
+#' Some that are not explicitly supported are still in the list.
 #'
 #' @param family Family for distribution provided as a string
 #'
@@ -203,4 +211,11 @@ buildDataGridString <- function(seq,add){
   # Trick here is that the datagrid requires a model or newdata when called outside of predictions(), comparisons() or slopes()
   sb <- paste0("datagrid2(model=userModel(),",seq,"=seq,",cadd,")")
   return(sb)
+}
+
+#' getValidSlopeFunction
+#'
+#' @returns Valid slopes as per marginaleffects package.
+getValidSlopeFunctions <- function(){
+  return(c("dydx", "eyex", "eydx", "dyex"))
 }
