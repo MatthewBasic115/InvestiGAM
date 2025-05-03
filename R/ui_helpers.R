@@ -8,6 +8,16 @@ responseScaleSelector <- function(id) {
   selectInput(id, label="Display Results on Link or Response Scale?", choices=c('link','response'))
 }
 
+#' Load a Markdown File from the Package's inst/markdown Directory
+#'
+#' @param filename Name of the markdown file, e.g. "teach_intro_text.md"
+#'
+#' @return Shiny generation of Markdown file
+#' @export
+loadMarkdown <- function(filename) {
+  withMathJax(includeMarkdown(system.file("markdown", filename, package = "InvestiGAM")))
+}
+
 #
 addDefaultToInputChoices <- function(input){
   ret <- append(input, "Default")
@@ -23,12 +33,22 @@ generateDesignTabPanel <- function(){
 }
 
 # Builds a Modal Dialog box for helpful tips
-buildModalDialog <- function(mtitle,mtext){
+#' Title
+#'
+#' @param mtitle 
+#' @param mdpath 
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+buildModalDialog <- function(mtitle,mdpath){
   showModal(
     modalDialog(
       title=mtitle,
       easy_close=TRUE,
-      mtext
+      size='l',
+      loadMarkdown(mdpath)
     )
   )
 }
@@ -108,7 +128,7 @@ generateInterpretTabPanel <- function(){
      ########### INTRO PANEL #################
      tabPanel("Introduction",
        titlePanel("Interpret Introduction"),
-       includeMarkdown("markdown/interpret_intro_text.md"),
+       loadMarkdown("interpret_intro_text.md"),
      ),
       ########## BASIS PANEL ##########
      tabPanel("Partial Effect of Smooths", 
@@ -203,7 +223,7 @@ generateComparisonsTabPanel <- function(){
       accordion(
         accordion_panel(
           title = "Introduction & Help",
-          includeMarkdown("markdown/teach_interpret_comparisons.md"),
+          loadMarkdown("teach_interpret_comparisons.md"),
         ),
         accordion_panel(
           title = "Datagrid Generation",
@@ -285,7 +305,7 @@ generateComparisonsTabPanel <- function(){
 
 generateRefTabPanel <- function(){
   tabPanel("References",
-    includeMarkdown("markdown/reference_list.md")
+    loadMarkdown("reference_list.md")
   ) # End TabPanel
 }
 

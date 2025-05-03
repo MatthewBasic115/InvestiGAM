@@ -10,9 +10,10 @@
 #' This is those supported by mgcv with some exclusions.
 #'
 #' @returns Valid subset of families supported by mgcv offered by the GUI
+#' @export
 getGamFamilies <- function(){
   # Families in GLM from family
-  famList <- c("binomial","guassian","Gamma","inverse.guassian","poisson","quasi","quasibinomial","quasipoisson",
+  famList <- c("binomial","gaussian","Gamma","inverse.gaussian","poisson","quasi","quasibinomial","quasipoisson",
                # families in mgcv #TODO: requires theta
                "negbin",
                # families in extended.family
@@ -32,7 +33,7 @@ getGamFamilies <- function(){
 #' Some that are not explicitly supported are still in the list.
 #'
 #' @param family Family for distribution provided as a string
-#'
+#' @export
 #' @returns Valid methods for the given family
 getGamMethods <- function(family){
   methodList = switch(

@@ -1,5 +1,14 @@
 
 #
+#' Title
+#'
+#' @param id 
+#' @param page_len 
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 studentServer <- function(id, page_len){
   data(engine);
   
