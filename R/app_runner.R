@@ -7,7 +7,7 @@
 #    https://shiny.posit.co/
 # https://shiny.posit.co/r/components/inputs/select-multiple/
 
-library(shiny)
+#library(shiny)
 library(mgcv)              # Fit and interrogate GAMs
 library(tidyverse)         # Tidy and flexible data manipulation
 library(marginaleffects)   # Compute conditional and marginal effects

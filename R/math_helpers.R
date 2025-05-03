@@ -65,6 +65,7 @@ getGamMethods <- function(family){
 #' @param family Distribution family to get the valid link functions for
 #'
 #' @returns Valid link functions for a given family with the first item being the canonical link function.
+#' @export
 getValidLinkFunction <- function(family){
   linkList = switch(
     family,
@@ -91,21 +92,34 @@ getValidLinkFunction <- function(family){
 }
 
 # Given a family and link, build a family object to pass into a model
+
+#' Title
+#'
+#' @param family 
+#' @param link 
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 buildFamilyValue <- function(family,link){
   fam_obj = eval(paste0(family,"(link= '",link,"')"))
   return(fam_obj)
 }
 
-# Build and return a spline object based on user input
-# Inputs
-# Smooth Term - one of ("s","te","ti","t2"). Defines what smooth term is being used. See mgcv doco for formula.gam
-# Covars - List of covariates to be included in the smooth
-# nKnots - Number of knots for the smooth
-# penalised - LOGICAL - Whether the spline will use a fixed d.f. regression spline or penalised regression spine (default)
-# smooth_class - Which smooth class is being used for the smooth. See smooth.terms in mgcv doco
-# by - optional - by in the spline definition. 'Default' is the default GUI input which will be ignored.
-# Returns
-# smooth - mgcv smooth object to be passed into a gam() formula for building a model
+#' Title buildSmooth
+#'
+#' @param smooth_term - one of ("s","te","ti","t2"). Defines what smooth term is being used. See mgcv doco for formula.gam
+#' @param covars - List of covariates to be included in the smooth
+#' @param nknots - Number of knots for the smooth
+#' @param penalised - LOGICAL - Whether the spline will use a fixed d.f. regression spline or penalised regression spine (default)
+#' @param smooth_class - Which smooth class is being used for the smooth. See smooth.terms in mgcv doco
+#' @param by - optional - by in the spline definition. 'Default' is the default GUI input which will be ignored.
+#'
+#' @returns mgcv smooth object to be passed into a gam() formula for building a model
+#' @export
+#'
+#' @examples
 buildSmooth <- function(smooth_term,covars,nknots,penalised,smooth_class, by){
   cleaned_covars = paste(covars,collapse=", ")
   
@@ -144,6 +158,12 @@ buildSequence <- function(selection, dtype){
 }
 
 # Valid smooth classes
+#' Title
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 getSmoothClasses <- function(){
   # Not supporting - sos, so, mrf, twlss, gevlss, multinom, mvn. However, they can be entered into the 'raw formula'
   #  TODO: If the family is tensor, then add sz basis.
