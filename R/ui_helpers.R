@@ -33,15 +33,17 @@ generateDesignTabPanel <- function(){
 }
 
 # Builds a Modal Dialog box for helpful tips
-#' Title
+#' buildModalDialog
 #'
-#' @param mtitle 
-#' @param mdpath 
+#' @param mtitle Title of the pop-up
+#' @param mdpath Name of markdown file located in markdown/ to display.
 #'
-#' @returns
+#' @returns Modal pop-up for Shiny with markdown page as content
 #' @export
 #'
-#' @examples
+#' @examples observe({buildModalDialog("Load Data Help", "load_help.md")}) %>% bindEvent(input$load_help_button)
+#' 
+#' Above is example of a help button observer which shows the modal dialog on click.
 buildModalDialog <- function(mtitle,mdpath){
   showModal(
     modalDialog(

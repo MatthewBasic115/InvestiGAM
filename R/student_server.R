@@ -84,7 +84,6 @@ studentServer <- function(id, page_len){
       # plot data
       plot(engine$size,engine$wear)
       # overlay estimated f
-      # %*% 
       lines(s, Xp %*% coef(b))
     })
   })

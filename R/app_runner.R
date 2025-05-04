@@ -8,20 +8,20 @@
 # https://shiny.posit.co/r/components/inputs/select-multiple/
 
 #library(shiny)
-library(mgcv)              # Fit and interrogate GAMs
-library(tidyverse)         # Tidy and flexible data manipulation
-library(marginaleffects)   # Compute conditional and marginal effects
-library(ggplot2)           # Flexible plotting
-library(patchwork)         # Combining ggplot objects
-library(gratia)
-library(DT)                # render data table outputs in Shiny
-library(glue)
-library(rlang)
-library(bslib)             # Bootstrap library for Shiny layouts
-library(gamair)            # Contains datasets useful for learning GAMs
-library(markdown)          # Allows for the use of markdown pages in the application
-library(mvgam)             # Conditional Effects Plot
-library(vroom)             # Load user supplied data
+#library(patchwork)        # Combining ggplot objects
+#library(DT)                # render data table outputs in Shiny
+#library(mgcv)              # Fit and interrogate GAMs
+#library(tidyverse)         # Tidy and flexible data manipulation
+#library(gamair)            # Contains datasets useful for learning GAMs
+#library(markdown)          # Allows for the use of markdown pages in the application
+#library(marginaleffects)   # Compute conditional and marginal effects
+#library(ggplot2)           # Flexible plotting
+#library(gratia)
+#library(glue)
+#library(rlang)
+#library(bslib)             # Bootstrap library for Shiny layouts
+#library(mvgam)             # Conditional Effects Plot
+#library(vroom)             # Load user supplied data
 #source("ui_helpers.R")
 #source("wrapper_helpers.R")
 #source("math_helpers.R")
@@ -65,7 +65,7 @@ run_app <- function(...){
     mutate(plant = factor(plant, ordered = FALSE))
   
   # fit model - from GAMbler blog
-  model_1 <- gam(uptake ~ treatment * type + 
+  model_1 <- mgcv::gam(uptake ~ treatment * type + 
                    s(plant, bs = "re") +
                    s(conc, by = treatment, k = 7),
                  data = plant, 
@@ -659,31 +659,31 @@ run_app <- function(...){
     ########### HELP MENU ITEMS #############
     
     observe({
-      showModal(buildModalDialog("Smooth Term Help", "build_smooth_term_help.md"))
+      buildModalDialog("Smooth Term Help", "build_smooth_term_help.md")
     }) %>% bindEvent(input$build_smooth_term_help)
     
     observe({
-      showModal(buildModalDialog("GAM Methods Help", "build_method_help.md"))
+      buildModalDialog("GAM Methods Help", "build_method_help.md")
     }) %>% bindEvent(input$build_methods_help_button)
     
     observe({
-      showModal(buildModalDialog("GAM Families Help", "build_families_help_button.md"))
+      buildModalDialog("GAM Families Help", "build_families_help_button.md")
     }) %>% bindEvent(input$build_families_help_button)
     
     observe({
-      showModal(buildModalDialog("Link Function Help", "build_link_help.md"))
+      buildModalDialog("Link Function Help", "build_link_help.md")
     }) %>% bindEvent(input$build_links_help_button)
     
     observe({
-      showModal(buildModalDialog("Load Data Help", "load_help.md"))
+      buildModalDialog("Load Data Help", "load_help.md")
     }) %>% bindEvent(input$load_help_button)
     
     observe({
-      showModal(buildModalDialog("Raw Formula Help", "raw_formula_help.md"))
+      buildModalDialog("Raw Formula Help", "raw_formula_help.md")
     }) %>% bindEvent(input$raw_form_help_button)
     
     observe({
-      showModal(buildModalDialog("Formula Terms Help", "build_terms_help_button.md"))
+      buildModalDialog("Formula Terms Help", "build_terms_help_button.md")
     }) %>% bindEvent(input$build_terms_help_button)
   }
   # Run the application 
