@@ -26,9 +26,9 @@ studentServer <- function(id, page_len){
   
   # manipulations for modelling
   plant <- CO2 |>
-    as_tibble() |>
-    rename(plant = Plant, type = Type, treatment = Treatment) |>
-    mutate(plant = factor(plant, ordered = FALSE))
+    dplyr::as_tibble() |>
+    dplyr::rename(plant = Plant, type = Type, treatment = Treatment) |>
+    dplyr::mutate(plant = factor(plant, ordered = FALSE))
   
   # fit model - from GAMbler blog
   # Problems with mvgam

@@ -21,23 +21,27 @@ generateTeachInterpretPage <- function(){
   )
 }
 
+#' generateTeachBuildPage
+#' @importFrom bslib accordion accordion_panel
+#' @returns Accordion which contains teach section markdown files
+#' @export
 generateTeachBuildPage <- function(){
   accordion(
     accordion_panel(
       title = "Build Introduction",
-      withMathJax(loadMarkdown("teach_build_intro.md"))
+      loadMarkdown("teach_build_intro.md")
     ),
     accordion_panel(
       title = "Hyperparameters",
-      withMathJax(loadMarkdown("teach_build_params.md"))
+      loadMarkdown("teach_build_params.md")
     ),
     accordion_panel(
       title = "Formula Terms",
-      withMathJax(loadMarkdown("teach_build_terms.md"))
+      loadMarkdown("teach_build_terms.md")
     ),
     accordion_panel(
       title = "GAM Appraisal",
-      withMathJax(loadMarkdown("teach_gam_appraise.md"))
+      loadMarkdown("teach_gam_appraise.md")
     ),
   )
 }

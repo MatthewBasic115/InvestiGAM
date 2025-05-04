@@ -35,6 +35,17 @@
 
 # ~~~~~~~~~~~~~~~~~~ SHINY SECTION ~~~~~~~~~~~~~~~~~~~~~~
 
+#' run_app 
+#'
+#' Runs the Shiny app
+#'
+#' @import shiny
+#' @importFrom gratia appraise which_smooths smooths basis
+#' @importFrom marginaleffects plot_predictions plot_comparisons plot_slopes
+#' @param ... ...
+#'
+#' @returns Shiny app to run
+#' @export
 run_app <- function(...){
   
   # define custom ggplot2 theme
