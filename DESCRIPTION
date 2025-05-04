@@ -2,28 +2,29 @@ Package: InvestiGAM
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+    person("Matthew", "Lord", ,"m.lord@student.uq.edu.au", role = c("aut", "cre"))
+Description: Provides a Shiny application which provides a GUI for GAM creation with mgcv and graphs for interpretation from marginaleffects.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
     bslib,
+    dplyr,
     DT,
     gamair,
     ggplot2,
     glue,
     gratia,
     marginaleffects,
-    markdown,
     mgcv,
     patchwork,
-    pkgload,
     rlang,
     shiny,
     vroom
 Depends: 
     R (>= 3.5),
     tidyverse
+Suggests:
+    pkgload
 LazyData: true

@@ -1,8 +1,6 @@
 ###
 ### This file contains functions for data manipulation.
 ###
-# Get list of valid families
-
 
 #' getGamFamilies
 #' 
@@ -171,9 +169,14 @@ getSmoothClasses <- function(){
   return(smooth_classes)
 }
 
+#' getFactorsForModel
+#'
+#' @param model mgcv model to get factor terms for
+#'
+#' @returns char vector containing factor terms for the model
 getFactorsForModel <- function(model){
   mv <- model_vars(model)
-  mp <- mapply(function(X) { return(is_factor_term(model,X))}, mv)
+  mp <- mapply(function(X) { return(gratia::is_factor_term(model,X))}, mv)
   factors <- mv[mp]
   return(factors)
 }

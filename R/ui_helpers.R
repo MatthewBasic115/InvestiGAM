@@ -1,7 +1,6 @@
 # 
 # This file contains helper functions for generating common UI elements.
 #
-library(shiny)
 
 # Simple function to select whether the user wants the link or response scale for a given scenario
 responseScaleSelector <- function(id) {
@@ -312,6 +311,11 @@ generateComparisonsTabPanel <- function(){
   ) # end tabPanel Comparisons
 }
 
+#' generateRefTabPanel
+#' 
+#' @importFrom shiny tabPanel
+#'
+#' @returns Shiny Tab Panel containing the reference list read from markdown.
 generateRefTabPanel <- function(){
   tabPanel("References",
     loadMarkdown("reference_list.md")

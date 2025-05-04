@@ -42,6 +42,7 @@
 #' @import shiny
 #' @importFrom gratia appraise which_smooths smooths basis
 #' @importFrom marginaleffects plot_predictions plot_comparisons plot_slopes
+#' @importFrom ggplot2 theme_set theme_classic theme
 #' @param ... ...
 #'
 #' @returns Shiny app to run
