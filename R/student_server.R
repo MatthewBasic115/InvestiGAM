@@ -2,19 +2,27 @@
 #
 #' Title
 #'
-#' @param id 
-#' @param page_len 
+#' @param id ID to be used for server namespace
+#' @param page_len number of pages in the student journey wizard
 #'
-#' @returns
+#' @returns module session holding objects and logic for teach section
 #' @export
 #'
-#' @examples
+#' @examples 
+#' # Load a student server with ID with ID "student" and 5 pages for the wizard.
+#' # Do not test as must be run in a Shiny session.
+#' \donttest{
+#' if (interactive()) {
+#'   studentServer("student", 5)
+#' }
+#' }
 studentServer <- function(id, page_len){
-  data(engine);
+  # Get the engine dataset from Gamair package
+  engine <- get("engine", envir = asNamespace("InvestiGAM"))
   
   # preload the C02 dataset
   # load C02 dataset
-  data(CO2, package = "datasets")
+  CO2 <- datasets::CO2
   
   # manipulations for modelling
   plant <- CO2 |>
@@ -24,28 +32,28 @@ studentServer <- function(id, page_len){
   
   # fit model - from GAMbler blog
   # Problems with mvgam
-  model_1 <- gam(uptake ~ treatment * type + 
+  model_1 <- mgcv::gam(uptake ~ treatment * type + 
                    s(plant, bs = "re") +
                    s(conc, by = treatment, k = 7),
                  data = plant, 
                  method = "REML", 
                  family = Gamma(link = "log"))
   
-  moduleServer(id, function(input,output,session){
+  shiny::moduleServer(id, function(input,output,session){
     
     ###### Student Journey ######
       
     # Appraise
-    output$userModelSummary <- renderPrint({
+    output$userModelSummary <- shiny::renderPrint({
       summary(model_1)
     })
     
-    output$userModelGamCheck <- renderPrint({
-      gam.check(model_1)
+    output$userModelGamCheck <- shiny::renderPrint({
+      mgcv::gam.check(model_1)
     })
     
-    output$userModelAppraisal <- renderPlot({
-      appraise(model_1, point_col = "steelblue", point_alpha = 0.4, method="simulate")
+    output$userModelAppraisal <- shiny::renderPlot({
+      gratia::appraise(model_1, point_col = "steelblue", point_alpha = 0.4, method="simulate")
     })
     
     # Render Datatable
@@ -55,8 +63,8 @@ studentServer <- function(id, page_len){
     
     # Functions sourced from Shiny Book to allow for page changes for the Wizard.
     changePage <- function(from, to) {
-      observeEvent(input[[paste0("go_", from, "_", to)]], {
-        updateTabsetPanel(session, "wizard", selected = paste0("page_", to))
+      shiny::observeEvent(input[[paste0("go_", from, "_", to)]], {
+        shiny::updateTabsetPanel(session, "wizard", selected = paste0("page_", to))
       })  
     }
     ids <- seq_len(page_len)
@@ -69,7 +77,7 @@ studentServer <- function(id, page_len){
     
     # Code in this section is adapted from Wood (2017, p.164-165) to allow interaction with the number of knots.
     # Generate the graph from Wood (2017, p.164)
-    output$plot_knot <- renderPlot({
+    output$plot_knot <- shiny::renderPlot({
       # size data
       ## generate 6 evenly spaced knots
       sj <- seq(min(engine$size),max(engine$size),length=input$teach_nknots)
@@ -88,9 +96,6 @@ studentServer <- function(id, page_len){
     })
   })
 }
-
-
-
 
 # Code in this section is directly sourced from Wood (2017, p.164-165).
 # Please see Reference list for full citation.
@@ -119,5 +124,4 @@ tf.X <- function(x,xj) {
   }
   X
 }
-
 ## END Wood (2017) Code

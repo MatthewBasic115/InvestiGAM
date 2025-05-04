@@ -95,13 +95,15 @@ getValidLinkFunction <- function(family){
 
 #' Title
 #'
-#' @param family 
-#' @param link 
+#' @param family Selected distribution from Family dropdown in GUI
+#' @param link Selected valid link function from dropdown in GUI
 #'
-#' @returns
+#' @returns family object for use in GAM formula.
 #' @export
 #'
-#' @examples
+#' @examples 
+#' # Gamma family using log link
+#' buildFamilyValue("Gamma", "log")
 buildFamilyValue <- function(family,link){
   fam_obj = eval(paste0(family,"(link= '",link,"')"))
   return(fam_obj)
@@ -118,8 +120,6 @@ buildFamilyValue <- function(family,link){
 #'
 #' @returns mgcv smooth object to be passed into a gam() formula for building a model
 #' @export
-#'
-#' @examples
 buildSmooth <- function(smooth_term,covars,nknots,penalised,smooth_class, by){
   cleaned_covars = paste(covars,collapse=", ")
   
@@ -158,12 +158,10 @@ buildSequence <- function(selection, dtype){
 }
 
 # Valid smooth classes
-#' Title
+#' getSmoothClasses
 #'
-#' @returns
+#' @returns a char vector of valid smooths
 #' @export
-#'
-#' @examples
 getSmoothClasses <- function(){
   # Not supporting - sos, so, mrf, twlss, gevlss, multinom, mvn. However, they can be entered into the 'raw formula'
   #  TODO: If the family is tensor, then add sz basis.

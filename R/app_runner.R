@@ -51,12 +51,12 @@ run_app <- function(...){
   
   # https://cran.r-project.org/web/packages/gamair/gamair.pdf pg 52
   # Simon Wood
-  data(brain)
+  brain <- get("brain", envir = asNamespace("InvestiGAM"))
   brain <- brain[brain$medFPQ>5e-3,]
   
   # preload the C02 dataset
   # load C02 dataset
-  data(CO2, package = "datasets")
+  CO2 <- datasets::CO2
   
   # manipulations for modelling
   plant <- CO2 |>
@@ -250,7 +250,6 @@ run_app <- function(...){
     
     # Update UI with new dataset when a new dataset is loaded
     observe({
-      # TODO: is tolower needed? Or do the tolower at when importing columns
       nm = names(userData())
       
       # Response variable selector
@@ -343,7 +342,8 @@ run_app <- function(...){
                   family = buildFamilyValue(input$gam_family,input$gam_link))
       }, error = function(e) {
         showModalErrorMessage(c(e[1]))
-        shiny:::reactiveStop(conditionMessage(e))
+        #shiny:::reactiveStop(conditionMessage(e))
+        reactiveStop(conditionMessage(e))
       })
       
       userModel(m)
@@ -456,7 +456,7 @@ run_app <- function(...){
     })
     
     output$plot_gam_condeff <- renderPlot({
-      mvgam::conditional_effects(userModel(), type=input$pred_link_response, rug=checkPlotOption("rug",input$int_plot_opt_checkbox))
+      #mvgam::conditional_effects(userModel(), type=input$pred_link_response, rug=checkPlotOption("rug",input$int_plot_opt_checkbox))
     })
     
     ########## PLOT PREDICTIONS ###############

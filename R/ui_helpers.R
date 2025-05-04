@@ -15,7 +15,7 @@ responseScaleSelector <- function(id) {
 #' @return Shiny generation of Markdown file
 #' @export
 loadMarkdown <- function(filename) {
-  withMathJax(includeMarkdown(system.file("markdown", filename, package = "InvestiGAM")))
+  shiny::withMathJax(shiny::includeMarkdown(system.file("markdown", filename, package = "InvestiGAM")))
 }
 
 #
@@ -37,16 +37,23 @@ generateDesignTabPanel <- function(){
 #'
 #' @param mtitle Title of the pop-up
 #' @param mdpath Name of markdown file located in markdown/ to display.
+#' 
+#' @importFrom shiny showModal modalDialog bindEvent
 #'
 #' @returns Modal pop-up for Shiny with markdown page as content
 #' @export
 #'
-#' @examples observe({buildModalDialog("Load Data Help", "load_help.md")}) %>% bindEvent(input$load_help_button)
+#' @examples 
+#' # Below is example of a help button observer which shows the modal dialog on click.
+#' \donttest{
+#' if (interactive()){
+#'   buildModalDialog("Load Data Help", "load_help.md")
+#' }
+#' }
 #' 
-#' Above is example of a help button observer which shows the modal dialog on click.
 buildModalDialog <- function(mtitle,mdpath){
-  showModal(
-    modalDialog(
+  shiny::showModal(
+    shiny::modalDialog(
       title=mtitle,
       easy_close=TRUE,
       size='l',
