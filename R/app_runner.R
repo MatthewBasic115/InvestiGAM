@@ -40,9 +40,12 @@
 #' Runs the Shiny app
 #'
 #' @import shiny
-#' @importFrom gratia appraise which_smooths smooths basis
+#' @importFrom bslib card card_header layout_column_wrap page_fluid page_fillable
+#' @importFrom gratia appraise which_smooths smooths basis model_vars draw
 #' @importFrom marginaleffects plot_predictions plot_comparisons plot_slopes
-#' @importFrom ggplot2 theme_set theme_classic theme
+#' @importFrom ggplot2 theme_set theme_classic theme labs geom_hline
+#' @importFrom graphics lines
+#' @importFrom mgcv gam.check gam
 #' @param ... ...
 #'
 #' @returns Shiny app to run
@@ -72,9 +75,9 @@ run_app <- function(...){
   
   # manipulations for modelling
   plant <- CO2 |>
-    as_tibble() |>
-    rename(plant = Plant, type = Type, treatment = Treatment) |>
-    mutate(plant = factor(plant, ordered = FALSE))
+    dplyr::as_tibble() |>
+    dplyr::rename(plant = Plant, type = Type, treatment = Treatment) |>
+    dplyr::mutate(plant = factor(plant, ordered = FALSE))
   
   # fit model - from GAMbler blog
   model_1 <- mgcv::gam(uptake ~ treatment * type + 

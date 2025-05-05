@@ -7,21 +7,21 @@
 # However, as 'conc' is model and context specific, we need to be able to pass in this argument name dynamically
 # Using this wrapper allows us to inject the argument name as a user input using "{name}":=seq where name can be any user input col name
 datagrid2 <- function(...){
-  do.call("datagrid", list2(...))
+  do.call("datagrid", rlang::list2(...))
 }
 
 # aes wrapper
 aes2 <- function(...){
-  do.call("aes",list2(...))
+  do.call("aes",rlang::list2(...))
 }
 
 #dataframe wrapper
 df2 <- function(...){
-  do.call("data.frame",list2(...))
+  do.call("data.frame",rlang::list2(...))
 }
 
 gam2 <- function(...){
-  do.call("gam",list2(...))
+  do.call("gam",rlang::list2(...))
 }
 
 # Error function helper
