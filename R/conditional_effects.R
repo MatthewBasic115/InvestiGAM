@@ -157,7 +157,7 @@ conditional_effects.gam = function(
 #' @importFrom brms conditional_effects
 brms::conditional_effects
 
-#' @rdname conditional_effects.mvgam
+#' @rdname conditional_effects.gam
 #' @export
 plot.gam_conditional_effects = function(x, plot = TRUE, ask = FALSE, ...) {
   out <- x
@@ -202,7 +202,7 @@ roundlabs = function(x) {
   out
 }
 
-#' @rdname conditional_effects.mvgam
+#' @rdname conditional_effects.gam
 #' @export
 print.gam_conditional_effects <- function(x, ...) {
   plot(x, ...)
