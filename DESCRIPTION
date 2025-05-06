@@ -21,7 +21,8 @@ Imports:
     patchwork,
     rlang,
     shiny,
-    vroom
+    vroom,
+    brms
 Depends: 
     R (>= 3.5),
     tidyverse
