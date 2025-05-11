@@ -1,5 +1,7 @@
-student_id = "student"
-
+#' generateTeachBuildPage
+#' @importFrom bslib accordion accordion_panel
+#' @returns Accordion which contains teach section markdown files
+#' @export
 generateTeachInterpretPage <- function(){
   accordion(
     accordion_panel(
@@ -46,7 +48,16 @@ generateTeachBuildPage <- function(){
   )
 }
 
+#' generateTeachGAMPage
+#' 
+#' Generates the UI for the GAM section of the Teach module.
+#' 
+#' @importFrom bslib accordion accordion_panel
+#' @importFrom shiny numericInput NS plotOutput
+#' @returns Accordion which contains teach section markdown files
+#' @export
 generateTeachGAMPage <- function(){
+  student_id = "student"
   accordion(
     accordion_panel(
       title = "Generalised Additive Models",
@@ -77,6 +88,9 @@ generateTeachGAMPage <- function(){
   )
 }
 
+#' generateTeachGLMPage
+#' @importFrom bslib accordion accordion_panel
+#' @returns Accordion which contains the GLM section of the Teach module
 generateTeachGLMPage <- function(){
   accordion(
     accordion_panel(
@@ -86,7 +100,16 @@ generateTeachGLMPage <- function(){
   )
 }
 
+#' generateTeachTabPanel
+#' 
+#' Generates the Tab Panel for the Learn module.
+#' 
+#' @importFrom bslib accordion accordion_panel page_fluid navset_pill
+#' @importFrom shiny numericInput NS plotOutput tabPanel fluidPage
+#' @returns Accordion which contains teach section markdown files
+#' @export
 generateTeachTabPanel <- function(){
+  student_id = "student"
   tabPanel("Learn",
     page_fluid(
       navset_pill(
@@ -108,8 +131,8 @@ generateTeachTabPanel <- function(){
         nav_panel("5. Example",
           fluidPage(
             wizardUI(student_id, pages=list(
-              generateExampleIntro(),generateExampleDataset(),generateExampleGam(),
-              generateExampleAppraise()
+              generateExampleIntro(),generateExampleDataset(student_id),generateExampleGam(),
+              generateExampleAppraise(student_id)
             ))
           )
         )
@@ -124,10 +147,10 @@ generateExampleIntro <- function(){
   )
 }
 
-generateExampleDataset <- function(){
+generateExampleDataset <- function(id){
   tagList(
     withMathJax(loadMarkdown("example_dataset.md")),
-    DT::dataTableOutput(NS(student_id, "example_data"))
+    DT::dataTableOutput(NS(id, "example_data"))
   )
 }
 
@@ -135,12 +158,12 @@ generateExampleGam <- function(){
   withMathJax(loadMarkdown("example_gam.md"))
 }
   
-generateExampleAppraise <- function(){
+generateExampleAppraise <- function(id){
   tagList(
     withMathJax(loadMarkdown("example_appraise.md")),
-    verbatimTextOutput(NS(student_id,"userModelSummary")),
-    verbatimTextOutput(NS(student_id,"userModelGamCheck")),
-    plotOutput(NS(student_id,"userModelAppraisal"))
+    verbatimTextOutput(NS(id,"userModelSummary")),
+    verbatimTextOutput(NS(id,"userModelGamCheck")),
+    plotOutput(NS(id,"userModelAppraisal"))
   )
 }
 

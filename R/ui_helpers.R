@@ -61,6 +61,73 @@ buildModalDialog <- function(mtitle,mdpath){
   )
 }
 
+#' generateBuildTabPanel
+#'
+#' Builds the UI for the Build Module
+#' @import shiny 
+#' @importFrom bslib navset_card_tab card card_header layout_column_wrap nav_panel
+#' @returns navset_card_tab for the model terms in the 'Build' module.
+generateBuildTabPanel <- function(){
+  tabPanel("Build",
+           page_fillable(
+             titlePanel("GAM Builder"),
+             h4("GAM Hyperparameters"),
+             # Put method, family and link into the same row
+             layout_column_wrap(
+               selectInput("gam_family", label="Family", choices=getGamFamilies(), selected="Gamma"),
+               # Uses getGamMethods(family) once updated.
+               selectInput("gam_method", label="Method", choices=c(), selected="REML"),
+               # gam_link is updated once a family is selected
+               selectInput("gam_link", label="Link", choices=c()),
+             ),
+             
+             # Put the help buttons in the row below
+             layout_column_wrap(
+               actionButton("build_families_help_button", "Family Help"),
+               actionButton("build_methods_help_button", "Methods Help"),
+               actionButton("build_links_help_button", "Link Help"),
+             ),
+             
+             titlePanel("Formula Terms"),
+             # Once the dataset is loaded, choices become avaliable
+             layout_column_wrap(
+               selectInput("build_response", label="Select response variable", choices=c()),
+               actionButton("build_terms_help_button", "Formula Terms Help", style = "margin-top: 25px;"),
+             ),
+             
+             
+             # Card which prints the formula preview for the user and allows them to undo a term
+             card(
+               card_header("Formula Preview"),
+               textOutput("build_formula"),
+               textOutput("build_splines"),
+               layout_column_wrap(
+                 actionButton("build_undo_button", "Undo"),
+                 actionButton("build","Create GAM"),
+               ),
+             ),
+             
+             # Builds the Card nav set which contains cards for building model formula and terms
+             generateBuildNavsetCardList(),
+             
+             # Card with tabs to add terms to the formula.
+             # As we are building a GAM, we have options for both parametric terms and smooths
+             card(
+               card_header("Operators"),
+               radioButtons("build_parametric_interaction", label="Select Interaction", choices=c("+","-",":","*","^"), inline=TRUE),
+               actionButton("build_operator_add_button", "Add Operator")
+             ),
+           ) # end mainPanel Build
+  ) # end tabPanel Build
+}
+
+
+#' generateBuildNavsetCardList
+#'
+#' Builds the Card with tabs for model terms in the 'Build' module.
+#' @import shiny 
+#' @importFrom bslib navset_card_tab card card_header layout_column_wrap nav_panel
+#' @returns navset_card_tab for the model terms in the 'Build' module.
 generateBuildNavsetCardList <- function(){
   navset_card_tab(
     # Card which holds parametric terms
@@ -115,7 +182,13 @@ generateBuildNavsetCardList <- function(){
   )
 }
 
-# This function generates the navigation UI for the Interpret tab
+
+#' generateInterpretTabPanel
+#'
+#  Generates the UI for the Interpret module
+#' @import shiny 
+#' @importFrom bslib navset_card_tab card card_header layout_column_wrap nav_panel
+#' @returns navset_card_tab for the model terms in the 'Build' module.
 generateInterpretTabPanel <- function(){
   tabPanel("Interpret",
   titlePanel("Interpret"),
@@ -123,10 +196,12 @@ generateInterpretTabPanel <- function(){
    accordion(
      accordion_panel(
        title="Plotting Options",
-       checkboxGroupInput("int_plot_opt_checkbox", "Plotting Options",
-                          c("Rug"="rug")
-       ),
-       responseScaleSelector("link_response")
+       layout_column_wrap(
+         checkboxGroupInput("int_plot_opt_checkbox", "Plotting Options",
+                            c("Rug"="rug")
+         ),
+         responseScaleSelector("link_response")
+       )
      ) # End interpret accordion
    ),
    # Generates the navigation list for the Interpret panel and it's contents
@@ -223,7 +298,12 @@ generateInterpretTabPanel <- function(){
   )
 }
 
-# Generates the UI for the 'Comparisons' tab in the Interpret menu.
+#' generateComparisonsTabPanel
+#'
+#' Generates the UI for the 'Comparisons' tab in the Interpret menu.
+#' @import shiny 
+#' @importFrom bslib navset_card_tab card card_header layout_column_wrap nav_panel
+#' @returns navset_card_tab for the model terms in the 'Build' module.
 generateComparisonsTabPanel <- function(){
   tabPanel("Comparisons",
     page_fluid(

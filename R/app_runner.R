@@ -92,6 +92,7 @@ run_app <- function(...){
     titlePanel("InvestiGAM"),
     selectInput("dataset", label = "Dataset", choices = ls("package:datasets"), selected="CO2"),
     tabsetPanel(
+      # The Welcome and load modules are small enough to not be moved to the ui_helpers file.
       tabPanel("Welcome",
                page_fillable(
                  loadMarkdown("welcome.md")
@@ -112,59 +113,8 @@ run_app <- function(...){
                ),
                DT::dataTableOutput("load_data"),
       ),
-      ########### BUILD ##############
-      tabPanel("Build",
-               page_fillable(
-                 titlePanel("GAM Builder"),
-                 h4("GAM Hyperparameters"),
-                 # Put method, family and link into the same row
-                 layout_column_wrap(
-                   selectInput("gam_family", label="Family", choices=getGamFamilies(), selected="Gamma"),
-                   # Uses getGamMethods(family) once updated.
-                   selectInput("gam_method", label="Method", choices=c(), selected="REML"),
-                   # gam_link is updated once a family is selected
-                   selectInput("gam_link", label="Link", choices=c()),
-                 ),
-                 
-                 # Put the help buttons in the row below
-                 layout_column_wrap(
-                   actionButton("build_families_help_button", "Family Help"),
-                   actionButton("build_methods_help_button", "Methods Help"),
-                   actionButton("build_links_help_button", "Link Help"),
-                 ),
-                 
-                 titlePanel("Formula Terms"),
-                 # Once the dataset is loaded, choices become avaliable
-                 layout_column_wrap(
-                   selectInput("build_response", label="Select response variable", choices=c()),
-                   actionButton("build_terms_help_button", "Formula Terms Help", style = "margin-top: 25px;"),
-                 ),
-                 
-                 
-                 # Card which prints the formula preview for the user and allows them to undo a term
-                 card(
-                   card_header("Formula Preview"),
-                   textOutput("build_formula"),
-                   textOutput("build_splines"),
-                   layout_column_wrap(
-                     actionButton("build_undo_button", "Undo"),
-                     actionButton("build","Create GAM"),
-                   ),
-                 ),
-                 
-                 # Builds the Card nav set which contains cards for building model formula and terms
-                 generateBuildNavsetCardList(),
-                 
-                 # Card with tabs to add terms to the formula.
-                 # As we are building a GAM, we have options for both parametric terms and smooths
-                 card(
-                   card_header("Operators"),
-                   radioButtons("build_parametric_interaction", label="Select Interaction", choices=c("+","-",":","*","^"), inline=TRUE),
-                   actionButton("build_operator_add_button", "Add Operator")
-                 ),
-               ) # end mainPanel Build
-      ), # end tabPanel Build
-      
+      # Build Tab Panel. Contains the UI for building a GAM.
+      generateBuildTabPanel(),
       # Appraisal Tab Panel. Contains plots and tools for evaluating the model
       generateAppraiseTabPanel(),
       # Generates Interpret tabs. Contains predictions, comparisons etc.
@@ -471,7 +421,7 @@ run_app <- function(...){
     })
     
     output$plot_gam_condeff <- renderPlot({
-      #mvgam::conditional_effects(userModel(), type=input$pred_link_response, rug=checkPlotOption("rug",input$int_plot_opt_checkbox))
+      conditional_effects.gam(userModel(), type=input$pred_link_response, rug=checkPlotOption("rug",input$int_plot_opt_checkbox))
     })
     
     ########## PLOT PREDICTIONS ###############

@@ -20,24 +20,20 @@ studentServer <- function(id, page_len){
   # Get the engine dataset from Gamair package
   engine <- get("engine", envir = asNamespace("InvestiGAM"))
   
-  # preload the C02 dataset
-  # load C02 dataset
-  CO2 <- datasets::CO2
+  portal_data <- get("portal_data", envir = asNamespace("InvestiGAM"))
   
-  # manipulations for modelling
-  plant <- CO2 |>
-    dplyr::as_tibble() |>
-    dplyr::rename(plant = Plant, type = Type, treatment = Treatment) |>
-    dplyr::mutate(plant = factor(plant, ordered = FALSE))
-  
-  # fit model - from GAMbler blog
-  # Problems with mvgam
-  model_1 <- mgcv::gam(uptake ~ treatment * type + 
-                   s(plant, bs = "re") +
-                   s(conc, by = treatment, k = 7),
-                 data = plant, 
-                 method = "REML", 
-                 family = Gamma(link = "log"))
+  # Model for student journey provided by Clark (private correspondence)
+  mod <- mgcv::gam(
+    captures ~ 
+      series + 
+      s(time, by = series, k = 10) +
+      s(ndvi_ma12, k = 4) +
+      s(ndvi_ma12, series, k = 4, bs = 'sz') +
+      s(mintemp, k = 4) +
+      s(mintemp, series, k = 4, bs = 'sz'),
+    family = poisson(),
+    data = portal_data
+  )
   
   shiny::moduleServer(id, function(input,output,session){
     

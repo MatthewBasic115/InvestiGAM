@@ -29,3 +29,20 @@ NULL
 #' 
 #' @source {gamair} S. Landau et. al. (2003). ‘Tests for a difference in timing of physiological response between two brain regions measured by using functional magnetic resonance imaging’. Journal of the Royal Statistical Society, Series C, Applied Statistics, 53(1):63-82
 NULL
+
+#' Rodent Captures from the Portal Project provided by mvgam package (Ernest et. al., 2018; Clark, 2024)
+#'
+#' A dataset containing timeseries of total captures (across all control plots) for select rodent species from the Portal Project
+#' @name portal_data
+#' @docType data
+#' @format A data frame with columns:
+#' \describe{
+#'   \item{time}{time of sampling, in lunar monthly cycles}
+#'   \item{series}{factor indicator of the time series, i.e. the species}
+#'   \item{captures}{total captures across all control plots}
+#'   \item{mintemp}{monthly mean minimum temperature}
+#'   \item{ndvi_ma12}{12-month moving average of the mean Normalised Difference Vegetation Index}
+#' }
+#' 
+#' @source {mvgam} https://github.com/weecology/PortalData/blob/main/SiteandMethods/Methods.md
+NULL

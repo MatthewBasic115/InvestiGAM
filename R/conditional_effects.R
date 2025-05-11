@@ -209,6 +209,7 @@ print.gam_conditional_effects <- function(x, ...) {
 }
 
 #' @noRd
+#' @importFrom mgcv s te t2 ti
 split_termlabs = function(lab) {
   out <- list()
   if (grepl(':', lab, fixed = TRUE)) {
