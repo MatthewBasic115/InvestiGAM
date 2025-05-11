@@ -162,10 +162,7 @@ buildSequence <- function(selection, dtype){
 #' @export
 getSmoothClasses <- function(){
   # Not supporting - sos, so, mrf, twlss, gevlss, multinom, mvn. However, they can be entered into the 'raw formula'
-  #  TODO: If the family is tensor, then add sz basis.
-  smooth_classes <- c("tp","ds","cr","cs","cc","bs","ps","re")
-  
-  # also not yet supporting ad, fs for tensor smooths only
+  smooth_classes <- c("tp","ds","cr","cs","cc","bs","ps","re", "sz")
   return(smooth_classes)
 }
 
@@ -175,7 +172,7 @@ getSmoothClasses <- function(){
 #'
 #' @returns char vector containing factor terms for the model
 getFactorsForModel <- function(model){
-  mv <- model_vars(model)
+  mv <- gratia::model_vars(model)
   mp <- mapply(function(X) { return(gratia::is_factor_term(model,X))}, mv)
   factors <- mv[mp]
   return(factors)

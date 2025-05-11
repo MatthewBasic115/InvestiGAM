@@ -132,7 +132,8 @@ generateTeachTabPanel <- function(){
           fluidPage(
             wizardUI(student_id, pages=list(
               generateExampleIntro(),generateExampleDataset(student_id),generateExampleGam(),
-              generateExampleAppraise(student_id)
+              generateExampleAppraise(student_id), generateExampleAppraise2(student_id),
+              generateExampleAppraise3(student_id)
             ))
           )
         )
@@ -161,9 +162,71 @@ generateExampleGam <- function(){
 generateExampleAppraise <- function(id){
   tagList(
     withMathJax(loadMarkdown("example_appraise.md")),
-    verbatimTextOutput(NS(id,"userModelSummary")),
-    verbatimTextOutput(NS(id,"userModelGamCheck")),
-    plotOutput(NS(id,"userModelAppraisal"))
+    accordion(
+      accordion_panel(
+        title = "Summary",
+        verbatimTextOutput(NS(id,"model1Summary"))
+      ),
+      accordion_panel(
+        title = "gam.check()",
+        verbatimTextOutput(NS(id,"model1GamCheck")),
+        
+      ),
+      accordion_panel(
+        title = "Appraisal Plots",
+        plotOutput(NS(id,"model1Appraisal"))
+      )
+    )
+  )
+}
+
+generateExampleAppraise2 <- function(id){
+  tagList(
+    withMathJax(loadMarkdown("example_appraise_2.md")),
+    accordion(
+      accordion_panel(
+        title = "Summary",
+        verbatimTextOutput(NS(id,"model2Summary"))
+      ),
+      accordion_panel(
+        title = "gam.check()",
+        withMathJax(loadMarkdown("example_appraise_2_check.md")),
+        verbatimTextOutput(NS(id,"model2GamCheck")),
+      ),
+      accordion_panel(
+        title = "Appraisal Plots",
+        withMathJax(loadMarkdown("example_appraise_2_app.md")),
+        plotOutput(NS(id,"model2Appraisal"))
+      )
+    )
+  )
+}
+
+generateExampleAppraise3 <- function(id){
+  tagList(
+    withMathJax(loadMarkdown("example_appraise_3.md")),
+    accordion(
+      accordion_panel(
+        title = "Summary",
+        verbatimTextOutput(NS(id,"model3Summary"))
+      ),
+      accordion_panel(
+        title = "gam.check()",
+        #withMathJax(loadMarkdown("example_appraise_2_check.md")),
+        verbatimTextOutput(NS(id,"model3GamCheck")),
+      ),
+      accordion_panel(
+        title = "Appraisal Plots",
+        #withMathJax(loadMarkdown("example_appraise_2_app.md")),
+        plotOutput(NS(id,"model3Appraisal"))
+      )
+    )
+  )
+}
+
+generateExampleWhatNow <- function(){
+  tagList(
+    withMathJax(loadMarkdown("example_what_now.md"))
   )
 }
 
@@ -180,12 +243,14 @@ wrapPage <- function(title, page, button_left = NULL, button_right = NULL) {
   tabPanel(
     title = title, 
     fluidRow(
-      column(12, page)
-    ), 
+      layout_column_wrap(
+        button_left,
+        button_right
+      )
+    ),
     fluidRow(
-      column(6, button_left),
-      column(6, button_right)
-    )
+      page
+    ), 
   )
 }
 

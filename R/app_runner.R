@@ -133,7 +133,7 @@ run_app <- function(...){
   server <- function(input, output, session) {
     
     # Student server, runs code for the teach section.
-    studentServer(student_id, 4)
+    studentServer(student_id, 6)
     
     ##### TESTING OR TEMPORARY ITEMS #######
     

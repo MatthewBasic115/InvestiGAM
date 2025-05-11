@@ -1,0 +1,5 @@
+# Increasing _k_
+
+For our last model gam.check() indicated that every term should have _k_ increased. However, the only term I have updated is our s(time, by=series) term. When you change _k_ for a smooth term in a GAM it can also change the k-index and statistical significance of other terms which you will see in this example below. This means that you'll want to be careful when updating _k_ for multiple smooths as it may not be clear how each change impacted the model.
+
+For this summary, we can see how increasing _k_ from 6 to 12 improved the model. The UBRE decreased from 0.71 to 0.37 and the deviance explained increased for 82.6% to 88.7% which indicates that this model performs better then our first model. Note how the edf has increased to use up almost all the new effective degrees of freedom provided by the increased _k_. Interestingly the s(ndvi\_mal12) term is now no longer statistically significant and has been shrunk to only use a single degree of freedom. We can investigate this further using gam.check().

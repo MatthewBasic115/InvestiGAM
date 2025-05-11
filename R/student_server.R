@@ -23,15 +23,39 @@ studentServer <- function(id, page_len){
   portal_data <- get("portal_data", envir = asNamespace("InvestiGAM"))
   
   # Model for student journey provided by Clark (private correspondence)
-  mod <- mgcv::gam(
+  model_1 <- mgcv::gam(
     captures ~ 
       series + 
-      s(time, by = series, k = 10) +
+      s(time, by = series, k = 6) +
       s(ndvi_ma12, k = 4) +
       s(ndvi_ma12, series, k = 4, bs = 'sz') +
       s(mintemp, k = 4) +
       s(mintemp, series, k = 4, bs = 'sz'),
-    family = poisson(),
+    family = poisson,
+    data = portal_data
+  )
+  
+  model_2 <- mgcv::gam(
+    captures ~ 
+      series + 
+      s(time, by = series, k = 12) +
+      s(ndvi_ma12, k = 4) +
+      s(ndvi_ma12, series, k = 4, bs = 'sz') +
+      s(mintemp, k = 4) +
+      s(mintemp, series, k = 4, bs = 'sz'),
+    family = poisson,
+    data = portal_data
+  )
+  
+  model_3 <- mgcv::gam(
+    captures ~ 
+      series + 
+      s(time, by = series, k = 20) +
+      s(ndvi_ma12, k = 4) +
+      s(ndvi_ma12, series, k = 4, bs = 'sz') +
+      s(mintemp, k = 4) +
+      s(mintemp, series, k = 4, bs = 'sz'),
+    family = poisson,
     data = portal_data
   )
   
@@ -40,21 +64,47 @@ studentServer <- function(id, page_len){
     ###### Student Journey ######
       
     # Appraise
-    output$userModelSummary <- shiny::renderPrint({
+    output$model1Summary <- shiny::renderPrint({
       summary(model_1)
     })
     
-    output$userModelGamCheck <- shiny::renderPrint({
+    output$model1GamCheck <- shiny::renderPrint({
       mgcv::gam.check(model_1)
     })
     
-    output$userModelAppraisal <- shiny::renderPlot({
+    output$model1Appraisal <- shiny::renderPlot({
       gratia::appraise(model_1, point_col = "steelblue", point_alpha = 0.4, method="simulate")
+    })
+    
+    # Appraise
+    output$model2Summary <- shiny::renderPrint({
+      summary(model_2)
+    })
+    
+    output$model2GamCheck <- shiny::renderPrint({
+      mgcv::gam.check(model_2)
+    })
+    
+    output$model2Appraisal <- shiny::renderPlot({
+      gratia::appraise(model_2, point_col = "steelblue", point_alpha = 0.4, method="simulate")
+    })
+    
+    # Appraise
+    output$model3Summary <- shiny::renderPrint({
+      summary(model_3)
+    })
+    
+    output$model3GamCheck <- shiny::renderPrint({
+      mgcv::gam.check(model_3)
+    })
+    
+    output$model3Appraisal <- shiny::renderPlot({
+      gratia::appraise(model_3, point_col = "steelblue", point_alpha = 0.4, method="simulate")
     })
     
     # Render Datatable
     output$example_data<- DT::renderDataTable({
-      DT::datatable(plant)
+      DT::datatable(portal_data)
     })
     
     # Functions sourced from Shiny Book to allow for page changes for the Wizard.
