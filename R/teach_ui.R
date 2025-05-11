@@ -212,12 +212,10 @@ generateExampleAppraise3 <- function(id){
       ),
       accordion_panel(
         title = "gam.check()",
-        #withMathJax(loadMarkdown("example_appraise_2_check.md")),
         verbatimTextOutput(NS(id,"model3GamCheck")),
       ),
       accordion_panel(
         title = "Appraisal Plots",
-        #withMathJax(loadMarkdown("example_appraise_2_app.md")),
         plotOutput(NS(id,"model3Appraisal"))
       )
     )
