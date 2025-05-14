@@ -270,7 +270,6 @@ generateInterpretTabPanel <- function(){
            selectizeInput("plot_slope_cond_var", "Select variable of interest",c(), multiple=TRUE),
            # Select condition for the slope plot
            selectizeInput("plot_slope_cond_cond", "Select conditional variables",c(), multiple=TRUE),
-           selectizeInput("plot_slope_by_by", "Select Factor variables",c(), multiple=TRUE),
            selectInput("plot_slope_cond_slope", "Select Slope",getValidSlopeFunctions(), selected="dydx"),
          ),
          

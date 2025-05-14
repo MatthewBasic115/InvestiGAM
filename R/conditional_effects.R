@@ -172,6 +172,20 @@ plot.gam_conditional_effects = function(x, plot = TRUE, ask = FALSE, ...) {
   invisible(out)
 }
 
+#' #' @rdname conditional_effects.gam
+#' #' @export
+#' plot.gam_conditional_effects = function(x, plot = TRUE, ask = FALSE, ...) {
+#'   out <- x
+#'   n <- length(x)
+#'   ncols <- ceiling(sqrt(n))
+#'   rows <- ceiling(n /ncols)
+#'   
+#'   patchwork::wrap_plots(x,
+#'                         byrow = TRUE, ncol = ncols, nrow = rows, widths = 1
+#'   )
+#'   browser()
+#' }
+
 #' A helper function so ggplot2 labels in the legend don't have
 #' ridiculous numbers of digits for numeric bins
 #' @noRd
