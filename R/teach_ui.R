@@ -133,7 +133,8 @@ generateTeachTabPanel <- function(){
             wizardUI(student_id, pages=list(
               generateExampleIntro(),generateExampleDataset(student_id),generateExampleGam(),
               generateExampleAppraise(student_id), generateExampleAppraise2(student_id),
-              generateExampleAppraise3(student_id)
+              generateExampleAppraise3(student_id), generateExampleWhatNow(student_id),
+              generateExampleBasicInterpret(student_id)
             ))
           )
         )
@@ -204,7 +205,7 @@ generateExampleAppraise2 <- function(id){
 
 generateExampleAppraise3 <- function(id){
   tagList(
-    withMathJax(loadMarkdown("example_appraise_3.md")),
+    withMathJax(loadMarkdown("gam_appraise_3.md")),
     accordion(
       accordion_panel(
         title = "Summary",
@@ -222,10 +223,65 @@ generateExampleAppraise3 <- function(id){
   )
 }
 
-generateExampleWhatNow <- function(){
+generateExampleWhatNow <- function(id){
   tagList(
-    withMathJax(loadMarkdown("example_what_now.md"))
+    withMathJax(loadMarkdown("example_what_now.md")),
+    navset_card_tab(
+      # Conditional Effects
+      nav_panel("Conditional Effects",
+        card_header("Conditional Effects Plot"),
+        withMathJax(loadMarkdown("example_interpret_cond_eff.md")),
+        responseScaleSelector(NS(id,"link_response")),
+        plotOutput(NS(id,"plot_gam_condeff"))
+      ),
+      nav_panel("Basis Functions",
+        card_header("Basis Function Plots"),
+        withMathJax(loadMarkdown("example_interpret_basis_functions.md")),
+        selectizeInput(NS(id,"simulated_smooth_select"), "Select Smooth to Plot Basis Functions", getPortalModelSmooths(), multiple=FALSE),
+        plotOutput(NS(id,"basis_func"))
+      ),
+    )
   )
+}
+
+generateExampleBasicInterpret <- function(id){
+  tagList(
+    withMathJax(loadMarkdown("example_interpret_main.md")),
+    navset_card_tab(
+      # Conditional Effects
+      nav_panel("Predictions",
+        card_header("Plot Predictions"),
+        withMathJax(loadMarkdown("example_interpret_pred.md")),
+        selectizeInput(NS(id,"plot_pred_cond"), "Select Conditional Predictors", getPortalModelVars(), multiple=TRUE),
+        selectizeInput(NS(id,"plot_pred_by"), "Select Marginal Predictors", getPortalModelVars(), multiple=TRUE),
+        plotOutput(NS(id,"plot_pred"))
+      ),
+      nav_panel("Slopes",
+        card_header("Plot Slopes"),
+        withMathJax(loadMarkdown("example_interpret_slopes.md")),
+        selectizeInput(NS(id,"plot_slope_cond_var"), "Select variable of interest",getPortalModelVars(), multiple=TRUE),
+        selectizeInput(NS(id,"plot_slope_cond_cond"), "Select conditional variables",getPortalModelVars(), multiple=TRUE),
+        selectizeInput(NS(id,"plot_slope_by_by"), "Select Factor variables",getPortalModelVars(), multiple=TRUE),
+        plotOutput(NS(id,"plot_slope"))
+      ),
+      nav_panel("Comparisons",
+        card_header("Plot Slopes"),
+        withMathJax(loadMarkdown("example_interpret_cond.md")),
+        selectizeInput(NS(id,"plot_slope_cond_var"), "Select variable of interest",getPortalModelVars(), multiple=TRUE),
+        selectizeInput(NS(id,"plot_slope_cond_cond"), "Select conditional variables",getPortalModelVars(), multiple=TRUE),
+        selectizeInput(NS(id,"plot_slope_by_by"), "Select Factor variables",getPortalModelVars(), multiple=TRUE),
+        plotOutput(NS(id,"plot_slope"))
+      ),
+    )
+  )
+}
+
+getPortalModelSmooths <- function(){
+  return(c("s(time):seriesDM", "s(time):seriesDO", "s(time):seriesPB", "s(time):seriesPP", "s(ndvi_ma12)", "s(ndvi_ma12,series)","s(mintemp)","s(mintemp,series)"))
+}
+
+getPortalModelVars <- function(){
+  return(c("series", "time", "ndvi_ma12", "mintemp"))
 }
 
 # Functions sourced from Mastering Shiny book https://mastering-shiny.org/scaling-modules.html#module-wizard

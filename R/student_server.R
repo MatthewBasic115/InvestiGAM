@@ -62,8 +62,15 @@ studentServer <- function(id, page_len){
   shiny::moduleServer(id, function(input,output,session){
     
     ###### Student Journey ######
+    
+    # Render Datatable
+    output$example_data<- DT::renderDataTable({
+      DT::datatable(portal_data)
+    })
+    
+    ###### Gam.check() and summary section ######
       
-    # Appraise
+    # Model 1 
     output$model1Summary <- shiny::renderPrint({
       summary(model_1)
     })
@@ -76,7 +83,7 @@ studentServer <- function(id, page_len){
       gratia::appraise(model_1, point_col = "steelblue", point_alpha = 0.4, method="simulate")
     })
     
-    # Appraise
+    # Model 2
     output$model2Summary <- shiny::renderPrint({
       summary(model_2)
     })
@@ -89,7 +96,7 @@ studentServer <- function(id, page_len){
       gratia::appraise(model_2, point_col = "steelblue", point_alpha = 0.4, method="simulate")
     })
     
-    # Appraise
+    # Model 3
     output$model3Summary <- shiny::renderPrint({
       summary(model_3)
     })
@@ -102,10 +109,37 @@ studentServer <- function(id, page_len){
       gratia::appraise(model_3, point_col = "steelblue", point_alpha = 0.4, method="simulate")
     })
     
-    # Render Datatable
-    output$example_data<- DT::renderDataTable({
-      DT::datatable(portal_data)
+    
+    #### Interpret Section ####
+    
+    ######## PLOT BASIC SMOOTHS AND BASIS FUNCTIONS ############
+    
+    # plot the basis functions
+    output$basis_func <- renderPlot({
+      smidx <- which_smooths(model_2, input$simulated_smooth_select)
+      draw(basis(model_2, select=smidx))
     })
+    
+    output$plot_gam_condeff <- renderPlot({
+      conditional_effects.gam(model_2, type=input$link_response)
+    })
+    
+    
+    ###### Plot others #####
+    
+    # Predictions
+    output$plot_pred <- renderPlot({
+      # ensure that feature selections are lower case
+      getPlotPredictions(model_2,c({input$plot_pred_cond}),
+                         "response",by=input$plot_pred_by, cond=input$plot_pred_cond)
+    })
+    
+    #Slope
+    output$plot_slope <- renderPlot({
+      plot_slopes(model_2, variables=c({input$plot_slope_cond_var}),
+        condition=c({input$plot_slope_cond_cond}), by={input$plot_slope_by_by}, type="response")
+    })
+    # Turn page code
     
     # Functions sourced from Shiny Book to allow for page changes for the Wizard.
     changePage <- function(from, to) {

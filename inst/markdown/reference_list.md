@@ -14,6 +14,8 @@ Hastie, T., & Tibshirani, R. (1986). Generalized Additive Models. _Statistical S
 
 Hester J, Wickham H, Bryan J (2023). vroom: Read and Write Rectangular Text Data Quickly. R package version 1.6.5, https://github.com/tidyverse/vroom, https://vroom.r-lib.org. 
 
+Ernest, S. K. M., Yenni, G. M., Allington, G., Bledsoe, E. K., Christensen, E. M., Diaz, R., Geluso, K., et al. (2018, October). Weecology/portaldata 1.64.0. _Zenodo_. doi:10.5281/zenodo.1475410
+
 Simpson, G. (2020, July 31st). _Introduction to Generalized Additive Models with R and mgcv_[Video]. Youtube. https://www.youtube.com/watch?v=sgw4cu8hrZM
 
 Simpson G. (2024). “gratia: An R package for exploring generalized additive models.” _Journal of Open Source Software_, 9(104), 6962. doi:10.21105/joss.06962. 

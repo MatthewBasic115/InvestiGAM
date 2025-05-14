@@ -7,34 +7,6 @@
 #    https://shiny.posit.co/
 # https://shiny.posit.co/r/components/inputs/select-multiple/
 
-#library(shiny)
-#library(patchwork)        # Combining ggplot objects
-#library(DT)                # render data table outputs in Shiny
-#library(mgcv)              # Fit and interrogate GAMs
-#library(tidyverse)         # Tidy and flexible data manipulation
-#library(gamair)            # Contains datasets useful for learning GAMs
-#library(markdown)          # Allows for the use of markdown pages in the application
-#library(marginaleffects)   # Compute conditional and marginal effects
-#library(ggplot2)           # Flexible plotting
-#library(gratia)
-#library(glue)
-#library(rlang)
-#library(bslib)             # Bootstrap library for Shiny layouts
-#library(mvgam)             # Conditional Effects Plot
-#library(vroom)             # Load user supplied data
-#source("ui_helpers.R")
-#source("wrapper_helpers.R")
-#source("math_helpers.R")
-#source("plot_helpers.R")
-#source("help_text.R")      # Contains help text for pop-ups
-#source("student_server.R") # Student journey module
-#source("teach_ui.R")
-
-
-
-
-# ~~~~~~~~~~~~~~~~~~ SHINY SECTION ~~~~~~~~~~~~~~~~~~~~~~
-
 #' run_app 
 #'
 #' Runs the Shiny app
@@ -133,7 +105,7 @@ run_app <- function(...){
   server <- function(input, output, session) {
     
     # Student server, runs code for the teach section.
-    studentServer(student_id, 6)
+    studentServer(student_id, 8)
     
     ##### TESTING OR TEMPORARY ITEMS #######
     

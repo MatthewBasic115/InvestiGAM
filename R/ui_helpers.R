@@ -4,7 +4,7 @@
 
 # Simple function to select whether the user wants the link or response scale for a given scenario
 responseScaleSelector <- function(id) {
-  selectInput(id, label="Display Results on Link or Response Scale?", choices=c('link','response'))
+  selectInput(id, label="Plot on Link or Response Scale?", choices=c('link','response'))
 }
 
 #' Load a Markdown File from the Package's inst/markdown Directory
@@ -228,10 +228,6 @@ generateInterpretTabPanel <- function(){
       ),
       ##########  BASIS FUNCTIONS PANEL ##########
       tabPanel("Basis Plots", 
-       # SIMULATE
-       # Select condition for the slope plot
-       # TODO: Talk to Nick and see if this should be deleted
-       #selectizeInput("simulated_feature_select", "Select Variable to Simulate", c(), multiple=FALSE),
        
        selectizeInput("simulated_smooth_select", "Select Smooth to Plot Basis Functions", c(), multiple=FALSE),
        
@@ -274,6 +270,7 @@ generateInterpretTabPanel <- function(){
            selectizeInput("plot_slope_cond_var", "Select variable of interest",c(), multiple=TRUE),
            # Select condition for the slope plot
            selectizeInput("plot_slope_cond_cond", "Select conditional variables",c(), multiple=TRUE),
+           selectizeInput("plot_slope_by_by", "Select Factor variables",c(), multiple=TRUE),
            selectInput("plot_slope_cond_slope", "Select Slope",getValidSlopeFunctions(), selected="dydx"),
          ),
          

@@ -1,0 +1,1 @@
+The below plot is what you would see if you selected 'Conditional Effects' item in the navigation menu for the Interpret module. It is based off the conditional\_effects() function found in the _mvgam_ package which is designed to provide a quick way to generate useful graphs for interpreting GAMs (Clark, 2024).
