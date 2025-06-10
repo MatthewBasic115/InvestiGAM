@@ -10,11 +10,13 @@ Clark, N. (2024, May 2). How to interpret and report nonlinear effects from Gene
 
 Clark, N.J., Wells, K. (2023). Dynamic Generalized Additive Models (DGAMs) for forecasting discrete ecological time series. _Methods in Ecology and Evolution._ DOI: https://doi.org/10.1111/2041-210X.13974
 
+Ernest, S. K. M., Yenni, G. M., Allington, G., Bledsoe, E. K., Christensen, E. M., Diaz, R., Geluso, K., et al. (2018, October). Weecology/portaldata 1.64.0. _Zenodo_. doi:10.5281/zenodo.1475410
+
+Wickham, H. (2021). Mastering Shiny (1st ed.). O’Reilly Media, Incorporated. Accessed via 	https://mastering-shiny.org/index.html 
+
 Hastie, T., & Tibshirani, R. (1986). Generalized Additive Models. _Statistical Science_, 1(3), 297–310. https://doi.org/10.1214/ss/1177013604
 
 Hester J, Wickham H, Bryan J (2023). vroom: Read and Write Rectangular Text Data Quickly. R package version 1.6.5, https://github.com/tidyverse/vroom, https://vroom.r-lib.org. 
-
-Ernest, S. K. M., Yenni, G. M., Allington, G., Bledsoe, E. K., Christensen, E. M., Diaz, R., Geluso, K., et al. (2018, October). Weecology/portaldata 1.64.0. _Zenodo_. doi:10.5281/zenodo.1475410
 
 Simpson, G. (2020, July 31st). _Introduction to Generalized Additive Models with R and mgcv_[Video]. Youtube. https://www.youtube.com/watch?v=sgw4cu8hrZM
 

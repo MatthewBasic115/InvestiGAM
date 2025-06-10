@@ -22,7 +22,8 @@ Imports:
     rlang,
     shiny,
     vroom,
-    brms
+    brms,
+    magrittr
 Depends: 
     R (>= 3.5),
     tidyverse

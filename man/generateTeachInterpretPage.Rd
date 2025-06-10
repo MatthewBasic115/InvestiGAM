@@ -2,7 +2,7 @@
 % Please edit documentation in R/teach_ui.R
 \name{generateTeachInterpretPage}
 \alias{generateTeachInterpretPage}
-\title{generateTeachBuildPage}
+\title{teach_ui.R}
 \usage{
 generateTeachInterpretPage()
 }
@@ -10,5 +10,10 @@ generateTeachInterpretPage()
 Accordion which contains teach section markdown files
 }
 \description{
+This file contains functions for generating the UI of the teach module.
+This includes the theory section and the student journey.
+There are also helper functions such as for the Wizard.
+}
+\details{
 generateTeachBuildPage
 }

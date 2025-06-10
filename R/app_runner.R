@@ -62,7 +62,6 @@ run_app <- function(...){
   ui <- fluidPage(
     
     titlePanel("InvestiGAM"),
-    selectInput("dataset", label = "Dataset", choices = ls("package:datasets"), selected="CO2"),
     tabsetPanel(
       # The Welcome and load modules are small enough to not be moved to the ui_helpers file.
       tabPanel("Welcome",
@@ -72,6 +71,13 @@ run_app <- function(...){
       ), # End Welcoime TabPanel
       ######## LOAD ########
       tabPanel("Load",
+               accordion(
+                 accordion_panel(
+                   title = "Quick Load",
+                   generateDesignTabPanel()
+                 ),
+                 open=FALSE
+               ),
                titlePanel("Load Dataset"),
                # Build model
                layout_column_wrap(
@@ -91,8 +97,6 @@ run_app <- function(...){
       generateAppraiseTabPanel(),
       # Generates Interpret tabs. Contains predictions, comparisons etc.
       generateInterpretTabPanel(),
-      # Generates the Design tab panel for quick switching between models
-      generateDesignTabPanel(),
       # This function generates a new UI for the student journey.
       generateTeachTabPanel(),
       # References
@@ -105,9 +109,9 @@ run_app <- function(...){
   server <- function(input, output, session) {
     
     # Student server, runs code for the teach section.
-    studentServer(student_id, 8)
+    studentServer(student_id)
     
-    ##### TESTING OR TEMPORARY ITEMS #######
+    ##### QUICKLOAD #######
     
     # Models from Gamair documentation
     # Builders for 'quickloading' models for testing.
@@ -141,11 +145,22 @@ run_app <- function(...){
       userModel(model_brain_ti)
     }) %>% bindEvent(input$quickload_brain_ti)
     
-    # reactive expressions act like functions however will only run the first time called
-    # then the output will be cached and only updated if required
-    dataset <- reactive({
-      get(input$dataset, "package:datasets")
-    })
+    observe({
+      portal_data <- get("portal_data", envir = asNamespace("InvestiGAM"))
+      model_2 <- mgcv::gam(
+        captures ~ 
+          series + 
+          s(time, by = series, k = 12) +
+          s(ndvi_ma12, k = 4) +
+          s(ndvi_ma12, series, k = 4, bs = 'sz') +
+          s(mintemp, k = 4) +
+          s(mintemp, series, k = 4, bs = 'sz'),
+        family = poisson,
+        data = portal_data
+      )
+      userData(portal_data)
+      userModel(model_2)
+    }) %>% bindEvent(input$quickload_portal)
     
     gam_formula <- reactive({
       typed_word <- input$formula 
@@ -173,7 +188,7 @@ run_app <- function(...){
       } else {
         df <- vroom::vroom(input$load_upload$datapath, delim=input$load_separator)
       }
-      return(df) 
+      return(df)
     }) %>% bindEvent(input$load_go_button)
     
     output$load_data<- DT::renderDataTable({
@@ -279,8 +294,7 @@ run_app <- function(...){
                   family = buildFamilyValue(input$gam_family,input$gam_link))
       }, error = function(e) {
         showModalErrorMessage(c(e[1]))
-        #shiny:::reactiveStop(conditionMessage(e))
-        reactiveStop(conditionMessage(e))
+        shiny::reactiveStop(conditionMessage(e))
       })
       
       userModel(m)
@@ -375,12 +389,6 @@ run_app <- function(...){
     ##############################
     
     ######## PLOT BASIC SMOOTHS AND BASIS FUNCTIONS ############
-    
-    # Map the smooth name to it's ID for simulation
-    feature_mappings_simu <- reactive({
-      mapped_idx = which_smooths(userModel(), input$simulated_smooth_select)
-    })
-    
     output$plot_gam <- renderPlot({
       smidx <- which_smooths(userModel(), input$interpret_smooth_select)
       draw(userModel(), select=smidx)
@@ -389,7 +397,7 @@ run_app <- function(...){
     # plot the basis functions
     output$basis_func <- renderPlot({
       smidx <- which_smooths(userModel(), input$simulated_smooth_select)
-      draw(basis(model_1, select=smidx))
+      draw(basis(userModel(), select=smidx))
     })
     
     output$plot_gam_condeff <- renderPlot({
@@ -618,6 +626,22 @@ run_app <- function(...){
     observe({
       buildModalDialog("Raw Formula Help", "raw_formula_help.md")
     }) %>% bindEvent(input$raw_form_help_button)
+    
+    observe({
+      buildModalDialog("Input Variable Help", "build_input_var_help.md")
+    }) %>% bindEvent(input$build_smooth_covariate_help)
+    
+    observe({
+      buildModalDialog("By Help", "build_input_by_help.md")
+    }) %>% bindEvent(input$build_smooth_by_help)
+    
+    observe({
+      buildModalDialog("Knots Help", "build_input_knots_help.md")
+    }) %>% bindEvent(input$build_smooth_k_help)
+    
+    observe({
+      buildModalDialog("Smooth Class Help", "build_smooth_class_help.md")
+    }) %>% bindEvent(input$build_smooth_class_help)
     
     observe({
       buildModalDialog("Formula Terms Help", "build_terms_help_button.md")

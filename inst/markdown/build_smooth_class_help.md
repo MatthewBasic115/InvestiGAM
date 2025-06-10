@@ -1,0 +1,3 @@
+This input determines the smooth class for your smooth. The default for this is "tp" for thin plate regression spline which should suit most circumstances. The details behind each of the different smooth options are quite technical. Please see (smooth.terms)[https://cran.r-project.org/web/packages/mgcv/mgcv.pdf#Rfn.smooth.terms] in the _mgcv_ doco for more information and a full overview of avaliable options.
+
+Note that InvestiGAM does not offer all smooth classes in order to keep UI inputs simple. In some cases, you will have access to smooth classes not provided by default using the Raw text input.

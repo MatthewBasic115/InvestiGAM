@@ -1,2 +1,3 @@
 With those introductory plots explained, we can move onto the three plot types provided by the _marginaleffects_ package (Arel-Bundock, 2024). These allow for the plotting of predictions, slopes and comparisons. The introduction here will be fairly light and doesn't provide the advanced options that you can see in the Interpret module. However, it is sufficient to quickly and easily interpret some outputs of the models.
 
+Please check each tab in the below card to read up on each of the functions. You can read more from the _marginaleffects_ [website](https://marginaleffects.com/bonus/plot.html) which will provide examples with code.

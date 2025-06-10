@@ -1,3 +1,10 @@
+#' teach_ui.R
+#'
+#' This file contains functions for generating the UI of the teach module.
+#' This includes the theory section and the student journey.
+#' There are also helper functions such as for the Wizard.
+#'
+
 #' generateTeachBuildPage
 #' @importFrom bslib accordion accordion_panel
 #' @returns Accordion which contains teach section markdown files
@@ -128,19 +135,24 @@ generateTeachTabPanel <- function(){
         nav_panel("4. Interpret",
           generateTeachInterpretPage()
         ),
-        nav_panel("5. Example",
+        nav_panel("5. Walkthrough",
           fluidPage(
             wizardUI(student_id, pages=list(
-              generateExampleIntro(),generateExampleDataset(student_id),generateExampleGam(),
+              generateExampleIntro(),generateExampleDataset(student_id),generateExampleDatasetPlots(student_id),
+              generateExampleGam(),
               generateExampleAppraise(student_id), generateExampleAppraise2(student_id),
               generateExampleAppraise3(student_id), generateExampleWhatNow(student_id),
-              generateExampleBasicInterpret(student_id)
+              generateExampleBasicInterpret(student_id), generateExampleConclusion()
             ))
           )
         )
       )
     )
   )
+}
+
+generateExampleConclusion <- function(){
+    withMathJax(loadMarkdown("example_conclusion.md"))
 }
 
 generateExampleIntro <- function(){
@@ -156,6 +168,21 @@ generateExampleDataset <- function(id){
   )
 }
 
+generateExampleDatasetPlots <- function(id){
+  tagList(
+    h2("Capture Count Histogram"),
+    withMathJax(loadMarkdown("example_data_plots.md")),
+    plotOutput(NS(id,"exampleCountHistogram")),
+    h3("Species Captures Counts"),
+    withMathJax(loadMarkdown("example_data_plots2.md")),
+    plotOutput(NS(id,"exampleTimeSeries")),
+    h3("DM Captures vs NDVI and mintemp"),
+    withMathJax(loadMarkdown("example_data_plot3.md")),
+    plotOutput(NS(id,"exampleTempnvdi"))
+  )
+}
+
+
 generateExampleGam <- function(){
   withMathJax(loadMarkdown("example_gam.md"))
 }
@@ -170,11 +197,13 @@ generateExampleAppraise <- function(id){
       ),
       accordion_panel(
         title = "gam.check()",
+        withMathJax(loadMarkdown("example_appraise_check.md")),
         verbatimTextOutput(NS(id,"model1GamCheck")),
         
       ),
       accordion_panel(
         title = "Appraisal Plots",
+        withMathJax(loadMarkdown("example_appraise_appraise.md")),
         plotOutput(NS(id,"model1Appraisal"))
       )
     )
@@ -228,11 +257,12 @@ generateExampleWhatNow <- function(id){
     withMathJax(loadMarkdown("example_what_now.md")),
     navset_card_tab(
       # Conditional Effects
-      nav_panel("Conditional Effects",
-        card_header("Conditional Effects Plot"),
+      nav_panel("Partial Effects",
+        card_header("Partial Effects Plot"),
         withMathJax(loadMarkdown("example_interpret_cond_eff.md")),
-        responseScaleSelector(NS(id,"link_response")),
-        plotOutput(NS(id,"plot_gam_condeff"))
+        #responseScaleSelector(NS(id,"link_response")),
+        selectizeInput(NS(id,"interpret_smooth_select"), "Select Smooth to Plot", getPortalModelSmooths(), multiple=FALSE),
+        plotOutput(NS(id,"plot_gam_parteff"))
       ),
       nav_panel("Basis Functions",
         card_header("Basis Function Plots"),
@@ -252,40 +282,54 @@ generateExampleBasicInterpret <- function(id){
       nav_panel("Predictions",
         card_header("Plot Predictions"),
         withMathJax(loadMarkdown("example_interpret_pred.md")),
-        selectizeInput(NS(id,"plot_pred_cond"), "Select Conditional Predictors", getPortalModelVars(), multiple=TRUE),
+        selectizeInput(NS(id,"plot_pred_cond"), "Select Conditional Predictors", getPortalModelVars(), multiple=TRUE, selected=c("series", "time")),
         selectizeInput(NS(id,"plot_pred_by"), "Select Marginal Predictors", getPortalModelVars(), multiple=TRUE),
         plotOutput(NS(id,"plot_pred"))
       ),
       nav_panel("Slopes",
         card_header("Plot Slopes"),
         withMathJax(loadMarkdown("example_interpret_slopes.md")),
-        selectizeInput(NS(id,"plot_slope_cond_var"), "Select variable of interest",getPortalModelVars(), multiple=TRUE),
-        selectizeInput(NS(id,"plot_slope_cond_cond"), "Select conditional variables",getPortalModelVars(), multiple=TRUE),
-        selectizeInput(NS(id,"plot_slope_by_by"), "Select Factor variables",getPortalModelVars(), multiple=TRUE),
+        layout_column_wrap(
+          selectizeInput(NS(id,"plot_slope_cond_var"), "Select variable of interest",getPortalModelVars(), multiple=TRUE, selected="mintemp"),
+          selectizeInput(NS(id,"plot_slope_cond_cond"), "Select Conditional Predictors",getPortalModelVars(), multiple=TRUE),
+          selectizeInput(NS(id,"plot_slope_by_by"), "Select Marginal Predictors",getPortalModelVars(), multiple=TRUE, selected="series")
+        ),
         plotOutput(NS(id,"plot_slope"))
       ),
       nav_panel("Comparisons",
-        card_header("Plot Slopes"),
-        withMathJax(loadMarkdown("example_interpret_cond.md")),
-        selectizeInput(NS(id,"plot_slope_cond_var"), "Select variable of interest",getPortalModelVars(), multiple=TRUE),
-        selectizeInput(NS(id,"plot_slope_cond_cond"), "Select conditional variables",getPortalModelVars(), multiple=TRUE),
-        selectizeInput(NS(id,"plot_slope_by_by"), "Select Factor variables",getPortalModelVars(), multiple=TRUE),
-        plotOutput(NS(id,"plot_slope"))
+        card_header("Plot Comparisons"),
+        withMathJax(loadMarkdown("example_interpret_comps.md")),
+        selectInput(NS(id,"comp_opt"), "Select 'Comparison' function",getValidCompareArguments(),selected="difference",multiple=FALSE),
+        layout_column_wrap(
+          selectizeInput(NS(id,"comp_var"), "Select Variable/s of Interest",getPortalModelVars(),multiple=TRUE, selected="series"),
+          selectizeInput(NS(id,"comp_cond"), "Select Conditional Predictors", getPortalModelVars(),multiple=TRUE, selected="time"),
+          selectizeInput(NS(id,"comp_by"), "Select Marginal Predictors", getPortalModelVars(),multiple=TRUE),
+        ),
+        plotOutput(NS(id,"plot_comp"))
       ),
     )
   )
 }
 
+# Smooths only
 getPortalModelSmooths <- function(){
   return(c("s(time):seriesDM", "s(time):seriesDO", "s(time):seriesPB", "s(time):seriesPP", "s(ndvi_ma12)", "s(ndvi_ma12,series)","s(mintemp)","s(mintemp,series)"))
 }
 
+# Predictors Only
 getPortalModelVars <- function(){
   return(c("series", "time", "ndvi_ma12", "mintemp"))
 }
 
-# Functions sourced from Mastering Shiny book https://mastering-shiny.org/scaling-modules.html#module-wizard
-# 19.4.2 Wizard
+# Includes response
+getPortalModelCols <- function(){
+  return(c("series", "time", "ndvi_ma12", "mintemp","captures"))
+}
+
+#### Code below adapted from Mastering Shiny (Wickham, 2021)
+#### Sourced from: https://mastering-shiny.org/scaling-modules.html#module-wizard
+#### See references.md for Citation
+
 nextPage <- function(id, i) {
   actionButton(NS(id, paste0("go_", i, "_", i + 1)), "next")
 }
@@ -293,38 +337,35 @@ prevPage <- function(id, i) {
   actionButton(NS(id, paste0("go_", i, "_", i - 1)), "prev")
 }
 
-wrapPage <- function(title, page, button_left = NULL, button_right = NULL) {
-  tabPanel(
-    title = title, 
+wrapPage <- function(title, page, button_prev, button_next) {
+  shiny::tabPanel(
+    title = title,
     fluidRow(
       layout_column_wrap(
-        button_left,
-        button_right
+        button_prev,
+        button_next
       )
     ),
     fluidRow(
       page
-    ), 
+    ),
   )
 }
 
-wizardUI <- function(id, pages, doneButton = NULL) {
-  stopifnot(is.list(pages))
+
+wizardUI <- function(id, pages) {
   n <- length(pages)
   
   wrapped <- vector("list", n)
   for (i in seq_along(pages)) {
-    # First page only has next; last page only prev + done
     lhs <- if (i > 1) prevPage(id, i)
-    rhs <- if (i < n) nextPage(id, i) else doneButton
+    rhs <- if (i < n) nextPage(id, i) else NULL
     wrapped[[i]] <- wrapPage(paste0("page_", i), pages[[i]], lhs, rhs)
   }
-  
-  # Create tabsetPanel
-  # https://github.com/rstudio/shiny/issues/2927
+  # Cannot use !!! due to tagList() being used to generate pages.
   wrapped$id <- NS(id, "wizard")
   wrapped$type <- "hidden"
   do.call("tabsetPanel", wrapped)
 }
 
-### END Mastering Shiny Code
+#### End Mastering Shiny Code

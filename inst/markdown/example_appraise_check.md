@@ -1,0 +1,5 @@
+*gam.check()*
+
+gam.check() is a function provided by _mgcv_ to help users determine an appropriate value for _k_ in their smooth terms.The edf column shows the effective degrees of freedom which must be smaller then k'. If edf is close to k' then the smooth is using most of the degrees of freedom that is provided by the smooths _k_ value. If the edf is well below k', then the smooth penalty is reducing the wiggliness of the smooth such that the higher _k_ value has little impact. The k-index and it's accompaying p-value, is a heuristic that indicates if _k_ is too low for a given smooth. As stated in the gam.check() output if the k-index is low (<1) then _k_ may be too small. In our example we can see the k-index is well below 1 for each term. Not only that, but our edf is quite close to k' for most terms. This indicates that we should increase _k_ and see if it improves the model.
+
+gam.check() also provides some useful plots to evaluate our GAM. InvestiGAM uses the appraise() function from _gratia_ to plot these. Let's check these plots in the next section before changing our model.

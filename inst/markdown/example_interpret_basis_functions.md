@@ -1,3 +1,3 @@
 This graph plots the basis functions for a given smooth using the _gratia_ draw() function (Simpson, 2024). It is the same as what you can find under the 'Basis Plots' item in the Interpret module. This can give you a good idea of how your smooths are constructed using the basis functions. For example, looking at s(ndvi\_ma12), you can see that the smooth was unable to model any complexity which likely contributed to it being statistically insignificant.
 
-TODO: Explain the factor stuff. Is it possible to get a better plot?
+When trying to plot the smooths with a "sz" basis we can see some weaknesses in how the draw() functions. Although the draw() function attempts to draw these basis it is not done in an easily interpretable way. In these cases it will be more useful to look at the plots on the next page.

@@ -163,32 +163,24 @@ plot.gam_conditional_effects = function(x, plot = TRUE, ask = FALSE, ...) {
   out <- x
   for (i in seq_along(out)) {
     if (plot) {
-      plot(out[[i]])
+      plot(out[[i]]) 
       if (i == 1) {
         devAskNewPage(ask = ask)
       }
     }
   }
+  # plot.gam_conditional_effects = function(x, plot = TRUE, ask = FALSE, ...) {
+  #   out <- x
+  #   n <- length(x)
+  #   ncols <- ceiling(sqrt(n))
+  #   rows <- ceiling(n /ncols)
+  # 
+  #   patchwork::wrap_plots(x,byrow = TRUE, ncol = ncols, nrow = rows, widths = 1, guides="keep", ...
+  #   )
+  # }
   invisible(out)
 }
 
-#' #' @rdname conditional_effects.gam
-#' #' @export
-#' plot.gam_conditional_effects = function(x, plot = TRUE, ask = FALSE, ...) {
-#'   out <- x
-#'   n <- length(x)
-#'   ncols <- ceiling(sqrt(n))
-#'   rows <- ceiling(n /ncols)
-#'   
-#'   patchwork::wrap_plots(x,
-#'                         byrow = TRUE, ncol = ncols, nrow = rows, widths = 1
-#'   )
-#'   browser()
-#' }
-
-#' A helper function so ggplot2 labels in the legend don't have
-#' ridiculous numbers of digits for numeric bins
-#' @noRd
 decimalplaces <- function(x) {
   x <- as.numeric(x)
   if (abs(x - round(x)) > .Machine$double.eps^0.5) {

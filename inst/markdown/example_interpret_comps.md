@@ -1,0 +1,8 @@
+This tab provides access to the plot\_comparisons() function from _marginaleffects_. This function allows you to compare how outcomes change in different scenarios. In the example below, we can see how different species compare based on the time variable. Note that the species are centered on the DM level, so each of the three other species are showing the difference between itself and DM.
+
+
+The power of this function is the ability to select different comparison methods and specify particular scenarios. The simple example below does allow for different comparison functions to be used but does not provide the advanced customisation that is found in the Interpret module.
+
+If you change the comparison to 'ratio' and conditional predictor to mintemp, you can see how the ratio of captures between each species and DM changes over different values of mintemp. It seems that when temperatures are below 0, the ratioo between other species and DM is relatively constant (except for PP). However, as temperatures increase each species capture rate increases relative to DMs.
+
+Clicking back to the default comparison of 'difference' we can see this on the response scale where the difference in captures is shown on the Y axis. Looking at the DO-DM comparison, we can see that the confidence interval is quite large. When mintemp is -1, we predict that capture count for the DO species will be lower by 8 with a confidence inteval between -12 and -6. When using these plots, it is important to consider the scale of the Y axes and the confidence intervals to ensure that you are interpreting the results correctly.

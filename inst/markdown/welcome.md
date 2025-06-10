@@ -1,6 +1,6 @@
 # Welcome
 
-Welcome to InvestiGAM (or Spline Seer?)!
+Welcome to InvestiGAM!
 
 InvestiGAM is a Shiny application which aims to teach it's users about Generalised Additive Models (GAMs) and provide tools to aid in interpreting their output. The GAMs are built using Simon Wood's mgcv package (Wood, 2025) and the interpretation tools make use of the marginaleffects package (Arel-Bundock et al., 2024). InvestiGAM consists of four primary components: build, appraise, interpret and learn.
 
@@ -39,12 +39,10 @@ The marginaleffects package (Arel-Bundock, 2024) is the core of the Interpret mo
 
 Simon Wood is the creator of the mgcv package and the book  _Generalized Additive Models: An Introduction with R_ (Wood, 2017) which s the primary source of the teaching material provided in this application. This application would not be possble without these two resources. Thank you Simon!
 
+Gavin Simpson, creator of the _gratia_ (Simpson, 2024) package which was used throughout the InvestiGAM to make it easier to work with GAMs. Gavin also has great youtube videos on learning how to use GAMs (see References tab for a link).
+
 Thank you to Dr. Nick Clark at the University of Queensland for supervising, guiding and reviewing this project.
 
 ### Citations
 
 See Reference tab for full reference list for the application.
-
-Arel-Bundock, V. (2024) “How to interpret statistical models in R and Python” The Marginal Effects Zoo. Retrieved September 2nd, 2024 from https://marginaleffects.com/
-
-Wood, S. N. (2017). Generalized additive models : an introduction with R (Second edition). CRC 	Press/Taylor & Francis Group.

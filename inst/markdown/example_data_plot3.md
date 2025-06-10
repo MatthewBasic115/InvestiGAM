@@ -1,0 +1,1 @@
+Looking at just the DM species we can see captures on the log scale agaisnt minimum temperature and the NDVI moving average. We can see how the NDVI moving average is clustered just below 0 following a slight increase but with considerably less examples. Although it is expected that the DM is less active during winter it is difficult to see a clear pattern here.

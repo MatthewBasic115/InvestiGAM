@@ -16,7 +16,7 @@
 #'   studentServer("student", 5)
 #' }
 #' }
-studentServer <- function(id, page_len){
+studentServer <- function(id){
   # Get the engine dataset from Gamair package
   engine <- get("engine", envir = asNamespace("InvestiGAM"))
   
@@ -68,6 +68,56 @@ studentServer <- function(id, page_len){
       DT::datatable(portal_data)
     })
     
+    ###### Clark (2025) Code #######
+    
+    # Introductory Plots for Model
+    # plot the basis functions
+    output$exampleCountHistogram <- renderPlot({
+      ggplot(portal_data,
+             aes(x = captures)) +
+        geom_histogram(col = 'white') +
+        theme_classic()
+    })
+    
+    # Introductory Plots for Model
+    # plot the basis functions
+    
+    output$exampleTimeSeries <- renderPlot({
+      ggplot(portal_data,
+             aes(x = time,
+                 y = captures)) +
+        geom_line() +
+        geom_point() +
+        facet_wrap(~series) +
+        theme_bw()
+    })
+    
+    
+    output$exampleTempnvdi <- renderPlot({
+      portal_data %>% 
+        dplyr::filter(series == 'DM') %>%
+        ggplot(aes(x = mintemp, y = log(captures))) +
+        geom_point() +
+        geom_smooth(method = "gam", formula = y ~ s(x, k = 10),
+                    col = 'darkred', fill = "#A25050") +
+        labs(title = 'DM',
+             y = "log(captures)", 
+             x = 'Minimum temperature') +
+        theme_classic() +
+        
+        portal_data %>% 
+        dplyr::filter(series == 'DM') %>%
+        ggplot(aes(x = ndvi_ma12, y = log(captures))) +
+        geom_point() +
+        geom_smooth(method = "gam", formula = y ~ s(x, k = 10),
+                    col = 'darkred', fill = "#A25050") +
+        labs(y = NULL, 
+             x = 'NDVI moving average') +
+        theme_classic()
+    })
+    
+    ######## END Clark (2025) Code ########
+    
     ###### Gam.check() and summary section ######
       
     # Model 1 
@@ -117,13 +167,17 @@ studentServer <- function(id, page_len){
     # plot the basis functions
     output$basis_func <- renderPlot({
       smidx <- which_smooths(model_2, input$simulated_smooth_select)
-      draw(basis(model_2, select=smidx))
+      gratia::draw(basis(model_2, select=smidx))
     })
     
-    output$plot_gam_condeff <- renderPlot({
-      conditional_effects.gam(model_2, type=input$link_response)
-    })
+    # output$plot_gam_condeff <- renderPlot({
+    #   conditional_effects.gam(model_2, type=input$link_response)
+    # })
     
+    output$plot_gam_parteff <- renderPlot({
+      smidx <- which_smooths(model_2, input$interpret_smooth_select)
+      draw(model_2, select=smidx)
+    })
     
     ###### Plot others #####
     
@@ -131,13 +185,17 @@ studentServer <- function(id, page_len){
     output$plot_pred <- renderPlot({
       # ensure that feature selections are lower case
       getPlotPredictions(model_2,c({input$plot_pred_cond}),
-                         "response",by=input$plot_pred_by, cond=input$plot_pred_cond)
+                         "response", FALSE, c({input$plot_pred_by}))
     })
     
     #Slope
     output$plot_slope <- renderPlot({
-      plot_slopes(model_2, variables=c({input$plot_slope_cond_var}),
-        condition=c({input$plot_slope_cond_cond}), by={input$plot_slope_by_by}, type="response")
+      # Need to refactor this.
+      getPlotSlopes(model_2,c({input$plot_slope_cond_var}), c({input$plot_slope_cond_cond}), c({input$plot_slope_by_by}))
+    })
+    
+    output$plot_comp <- renderPlot({
+      getStudentPlotComparisons(model_2,c({input$comp_var}),c({input$comp_cond}),c({input$comp_by}), input$comp_opt)
     })
     # Turn page code
     
@@ -147,9 +205,9 @@ studentServer <- function(id, page_len){
         shiny::updateTabsetPanel(session, "wizard", selected = paste0("page_", to))
       })  
     }
-    ids <- seq_len(page_len)
+    ids <- seq_len(10)
     lapply(ids[-1], function(i) changePage(i, i - 1))
-    lapply(ids[-page_len], function(i) changePage(i, i + 1))
+    lapply(ids[-10], function(i) changePage(i, i + 1))
     
     # End Shiny page change functions
     

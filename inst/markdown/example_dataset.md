@@ -4,11 +4,17 @@ In this example we will be using the data from the Portal Project which uses bai
 
 The dataset contains the following variables:
 
-time - Time step for given observation (e.g. 1, 2, ..., t)
-series - factor indicator of the time series - maps to the target species
-captures - total captures across all control plots
-mintemp - monthly mean minimum temperature
-ndvi\_ma12 - 12 month moving average of the mean Normalised Difference Vegetation Index
+_time_ - Time step for given observation (e.g. 1, 2, ..., t)
+
+_series_ - factor indicator of the time series - maps to the different species. Different species have different populations and may have different reactions to the other predictors in this dataset.
+
+This dataset has four species. Ord's kangaroo rat (DO), Bailey's pocket mouse (PB), Merriam's kangaroo rat (DM) and the Desert pocket mouse (PP).
+
+_captures_ - total captures across all control plots
+
+_mintemp_ - monthly mean minimum temperature. It is expected that the rodent species in this dataset will be less active during the winter.
+
+_ndvi\_ma12_ - 12 month moving average of the mean Normalised Difference Vegetation Index - which is a measure of how dense the vegetation is in an area.
 
 To learn more visit the [Portal Project](https://portal.weecology.org/) website or type ?mvgam::portal\_data to learn more.
 

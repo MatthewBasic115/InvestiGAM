@@ -5,7 +5,7 @@ The concepts taught allow the user to interact with the application and learn ho
 It is expected that students who wish to understand the underlying theory will learn this in their classroom, from the textbook or other sources themselves.
 Although the tutorial is designed to introduce students to GAMs, it is also a useful tool for any person who wishes to learn how to use this application.
 
-You can select which lessons to view from the tabs above.
+You can select the learning material you are interested in from the above tabs. If you are comfortable with GAM theory, then you can try the Walkthrough to see a worked example. Alternatively, you can also read the Build and Interpret tabs for information specific to InvestiGAM.
 
 ### Pre-requisites
 

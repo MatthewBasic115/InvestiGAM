@@ -219,8 +219,7 @@ getValidDataGridTypes <- function(){
 #'
 #' @returns Valid functions for the comparisons argument in plot_comparisons. Some have been skipped for brevity.
 getValidCompareArguments <- function(){
-  vals <- c("difference", "lnor", "differenceavg","ratio", "lnratio", "lift","dydx", "eyex", "eydx", "dyex","dydxavg","eyexavg",
-            "eydxavg","dyexavg","ratioavg","lnratioavg","lnoravg","liftavg","expdydx","expdydxavg")
+  vals <- c("difference", "lnor","ratio", "lnratio", "lift","dydx", "eyex", "eydx", "dyex","expdydx")
   return(vals)
 }
 

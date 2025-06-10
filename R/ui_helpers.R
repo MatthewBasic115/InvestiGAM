@@ -4,7 +4,7 @@
 
 # Simple function to select whether the user wants the link or response scale for a given scenario
 responseScaleSelector <- function(id) {
-  selectInput(id, label="Plot on Link or Response Scale?", choices=c('link','response'))
+  selectInput(id, label="Plot on Link or Response Scale?", choices=c("link","response"), selected="response")
 }
 
 #' Load a Markdown File from the Package's inst/markdown Directory
@@ -24,10 +24,14 @@ addDefaultToInputChoices <- function(input){
 }
 
 generateDesignTabPanel <- function(){
-  tabPanel("Design",
+  tagList(
+           p("This page allows you to quickly load example models and datasets.
+             If you want to load the portal project model from the walkthrough,
+             click on quickload_portal below."),
            actionButton("quickload_brain","quickload_brain"),
            actionButton("quickload_brain_te","quickload_brain_te"),
-           actionButton("quickload_brain_ti","quickload_brain_ti")
+           actionButton("quickload_brain_ti","quickload_brain_ti"),
+           actionButton("quickload_portal", "quickload_portal")
   ) # end tabPanel design
 }
 
@@ -150,8 +154,8 @@ generateBuildNavsetCardList <- function(){
       # options for smooth terms
       
       layout_column_wrap(
-        selectInput("build_covariates_term",label="Select Covariates", choices=c(),multiple=TRUE),
-        actionButton("build_smooth_covariate_help","Covariate Help", style = "margin-top: 25px;"),
+        selectInput("build_covariates_term",label="Select Variable", choices=c(),multiple=TRUE),
+        actionButton("build_smooth_covariate_help","Variable Help", style = "margin-top: 25px;"),
       ),
       
       layout_column_wrap(
@@ -161,7 +165,12 @@ generateBuildNavsetCardList <- function(){
       
       layout_column_wrap(
         numericInput("build_nknots","Knots (k) - Set to -1 for Default", value=-1,min=-1),
+        actionButton("build_smooth_k_help","Knots Help", style = "margin-top: 25px;"),
+      ),
+      
+      layout_column_wrap(
         selectInput("build_smooth_classes (bs)", "Smooth Class", choices=addDefaultToInputChoices(getSmoothClasses()),selected="Default"),
+        actionButton("build_smooth_class_help","Smooth Class Help", style = "margin-top: 25px;"),
       ),
 
       radioButtons("build_penalised", label="Fixed d.f. or penalized?", 
@@ -223,9 +232,6 @@ generateInterpretTabPanel <- function(){
        selectizeInput("interpret_smooth_select", "Select Smooth to Plot", c(), multiple=FALSE),
        plotOutput("plot_gam"),
       ),
-      tabPanel("Condtional Effect of Smooths",
-        plotOutput("plot_gam_condeff")
-      ),
       ##########  BASIS FUNCTIONS PANEL ##########
       tabPanel("Basis Plots", 
        
@@ -233,7 +239,6 @@ generateInterpretTabPanel <- function(){
        
        plotOutput("basis_func"),
       ),
-      ########### QUICK NICK PLOTS ##############
       ########### PREDICTIONS PANEL #############
       tabPanel("Predictions", 
         titlePanel("Plot Predictions"),
